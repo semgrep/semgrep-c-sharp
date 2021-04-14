@@ -1,0 +1,28 @@
+File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
+Git repo name: ocaml-tree-sitter
+Last git commit:
+  commit 9e33bc572055057bb1ceee1b28d6245d80e78ec3
+  Author: Damien Guard <damieng@gmail.com>
+  Date:   Fri Feb 12 17:22:37 2021 +0000
+  
+      Fix prec between switch and binary (#160)
+---
+File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
+Git repo name: ocaml-tree-sitter
+Last git commit:
+  commit 9e33bc572055057bb1ceee1b28d6245d80e78ec3
+  Author: Damien Guard <damieng@gmail.com>
+  Date:   Fri Feb 12 17:22:37 2021 +0000
+  
+      Fix prec between switch and binary (#160)
+---
+File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
+Git repo name: ocaml-tree-sitter
+Last git commit:
+  commit 9bca49eafc8489bc0d508057079bec9b7d10f65e
+  Author: Martin Jambon <martin@returntocorp.com>
+  Date:   Wed Apr 14 16:44:28 2021 -0700
+  
+      Include new file 'fyi/versions' that tracks git info associated with
+      each file in the "FYI" list.
+---
