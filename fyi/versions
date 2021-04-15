@@ -1,15 +1,19 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: ocaml-tree-sitter
-Last git commit:
-  commit 9e33bc572055057bb1ceee1b28d6245d80e78ec3
-  Author: Damien Guard <damieng@gmail.com>
-  Date:   Fri Feb 12 17:22:37 2021 +0000
+Latest commit in repo: 9e33bc572055057bb1ceee1b28d6245d80e78ec3
+Last change in file:
+  commit 2a890da4b93c34fefc28be97e6fdc4b8aaacf735
+  Author: Max Brunsfeld <maxbrunsfeld@gmail.com>
+  Date:   Tue Nov 15 12:28:45 2016 -0800
   
-      Fix prec between switch and binary (#160)
+      Add LICENSE, README, travis config file
+      
+      Signed-off-by: Damien Guard <damieng@github.com>
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter
-Last git commit:
+Latest commit in repo: 9e33bc572055057bb1ceee1b28d6245d80e78ec3
+Last change in file:
   commit 9e33bc572055057bb1ceee1b28d6245d80e78ec3
   Author: Damien Guard <damieng@gmail.com>
   Date:   Fri Feb 12 17:22:37 2021 +0000
@@ -18,10 +22,16 @@ Last git commit:
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter
-Last git commit:
-  commit b1b6d3e7595b5368f61588db168fea32774b3f81
-  Author: Martin Jambon <martin@returntocorp.com>
-  Date:   Wed Apr 14 16:59:53 2021 -0700
+Latest commit in repo: fb2667d48dd92c95c1943d7899c5559b9ea1316e
+Last change in file:
+  commit 1cfa0a2c63a1218cf7752cb1504689eed2511548
+  Merge: e5e0c02 dbc2761
+  Author: Martin Jambon <martin@mjambon.com>
+  Date:   Fri Feb 5 17:06:26 2021 -0800
   
-      Add release file containing the tree-sitter version
+      Add 'lang/semgrep-grammars/' from commit 'dbc2761d2c62e60d2181d777393f9eaea08673a1'
+      
+      git-subtree-dir: lang/semgrep-grammars
+      git-subtree-mainline: e5e0c029006cf2d087615cc1420db28550c9ad38
+      git-subtree-split: dbc2761d2c62e60d2181d777393f9eaea08673a1
 ---
