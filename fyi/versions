@@ -1,5 +1,5 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
-Git repo name: ocaml-tree-sitter
+Git repo name: tree-sitter-c-sharp
 Latest commit in repo: 9e33bc572055057bb1ceee1b28d6245d80e78ec3
 Last change in file:
   commit 2a890da4b93c34fefc28be97e6fdc4b8aaacf735
@@ -11,7 +11,7 @@ Last change in file:
       Signed-off-by: Damien Guard <damieng@github.com>
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
-Git repo name: ocaml-tree-sitter
+Git repo name: tree-sitter-c-sharp
 Latest commit in repo: 9e33bc572055057bb1ceee1b28d6245d80e78ec3
 Last change in file:
   commit 9e33bc572055057bb1ceee1b28d6245d80e78ec3
@@ -22,7 +22,7 @@ Last change in file:
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter
-Latest commit in repo: fb2667d48dd92c95c1943d7899c5559b9ea1316e
+Latest commit in repo: f0469e1b59ee4df9d8cdded2a7d5cb124f3ea264
 Last change in file:
   commit 1cfa0a2c63a1218cf7752cb1504689eed2511548
   Merge: e5e0c02 dbc2761
