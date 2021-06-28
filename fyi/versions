@@ -1,6 +1,6 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 9e33bc572055057bb1ceee1b28d6245d80e78ec3
+Latest commit in repo: 3953034ee61e8639100b063092d4280e047ca9e9
 Last change in file:
   commit 2a890da4b93c34fefc28be97e6fdc4b8aaacf735
   Author: Max Brunsfeld <maxbrunsfeld@gmail.com>
@@ -12,17 +12,19 @@ Last change in file:
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 9e33bc572055057bb1ceee1b28d6245d80e78ec3
+Latest commit in repo: 3953034ee61e8639100b063092d4280e047ca9e9
 Last change in file:
-  commit 9e33bc572055057bb1ceee1b28d6245d80e78ec3
-  Author: Damien Guard <damieng@gmail.com>
-  Date:   Fri Feb 12 17:22:37 2021 +0000
+  commit 2482d579c4ebc5bd85b5325994094b6459758a07
+  Author: Sjoerd Langkemper <sjoerd-github@linuxonly.nl>
+  Date:   Fri Jun 18 11:51:44 2021 +0200
   
-      Fix prec between switch and binary (#160)
+      Don't allow extra's in verbatim interpolated strings
+      
+      Closes #197.
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
-Git repo name: ocaml-tree-sitter
-Latest commit in repo: 28f750bb894ea4c0a7f6b911e568ab9d731cc0b5
+Git repo name: ocaml-tree-sitter-semgrep
+Latest commit in repo: 95b92665611523c66ea971d603de853e2f7e88d1
 Last change in file:
   commit 8e3333ae6d72231d2f422233e3bcc1be6fc0e02d
   Author: Sjoerd Langkemper <sjoerd-github@linuxonly.nl>

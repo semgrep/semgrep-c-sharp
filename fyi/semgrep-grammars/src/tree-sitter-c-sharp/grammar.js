@@ -1,10 +1,13 @@
 const PREC = {
-  DOT: 17,
-  INVOCATION: 16,
-  POSTFIX: 16,
-  PREFIX: 15,
-  UNARY: 15,
-  CAST: 14,
+  DOT: 18,
+  INVOCATION: 18,
+  POSTFIX: 18,
+  PREFIX: 17,
+  UNARY: 17,
+  CAST: 17,
+  RANGE: 16,
+  SWITCH: 15,
+  WITH: 14,
   MULT: 13,
   ADD: 12,
   SHIFT: 11,
@@ -15,10 +18,9 @@ const PREC = {
   OR: 6,
   LOGAND: 5,
   LOGOR: 4,
-  COND: 3,
-  ASSIGN: 2,
-  SEQ: 1,
-  TERNARY: 1,  
+  COALESCING: 3,
+  COND: 2,
+  ASSIGN: 1,
   SELECT: 0,
   TYPE_PATTERN: -2,
 };
@@ -31,7 +33,7 @@ module.exports = grammar({
   extras: $ => [
     $.comment,
     /[\s\u00A0\uFEFF\u3000]+/,
-    $.preprocessor_call
+    $._preprocessor_call
   ],
 
   supertypes: $ => [
@@ -78,7 +80,9 @@ module.exports = grammar({
     [$.parameter, $.declaration_expression],
     [$.tuple_element],
     [$.tuple_element, $.declaration_expression],
-    [$.tuple_element, $.variable_declarator]
+    [$.tuple_element, $.variable_declarator],
+
+    [$.array_creation_expression, $.element_access_expression]
   ],
 
   inline: $ => [
@@ -201,7 +205,7 @@ module.exports = grammar({
     ),
 
     attribute_argument: $ => seq(
-      optional(choice($.name_equals,$.name_colon)),
+      optional(choice($.name_equals, $.name_colon)),
       $._expression
     ),
 
@@ -382,7 +386,7 @@ module.exports = grammar({
     type_parameter_list: $ => seq('<', commaSep1($.type_parameter), '>'),
 
     type_parameter: $ => seq(
-      optional($.attribute_list),
+      repeat($.attribute_list),
       optional(choice('in', 'out')),
       $.identifier
     ),
@@ -581,7 +585,7 @@ module.exports = grammar({
       field('parameters', optional($.parameter_list)),
       field('bases', optional(alias($.record_base, $.base_list))),
       repeat($.type_parameter_constraints_clause),
-      field('body', $._record_base),
+      field('body', $._record_body),
     ),
 
     record_base: $ => choice(
@@ -594,7 +598,7 @@ module.exports = grammar({
       $.argument_list
     ),
 
-    _record_base: $ => choice(
+    _record_body: $ => choice(
       $.declaration_list,
       ';'
     ),
@@ -1053,11 +1057,11 @@ module.exports = grammar({
       $._expression
     ),
 
-    array_creation_expression: $ => seq(
+    array_creation_expression: $ => prec.dynamic(PREC.UNARY, seq(
       'new',
       $.array_type,
       optional($.initializer_expression)
-    ),
+    )),
 
     initializer_expression: $ => seq(
       '{',
@@ -1160,15 +1164,19 @@ module.exports = grammar({
 
     interpolated_string_text: $ => choice(
       '{{',
-      token.immediate(prec(1, /[^{"\\\n]+/)),
+      $._interpolated_string_text_fragment,
       $.escape_sequence
     ),
 
+    _interpolated_string_text_fragment: $ => token.immediate(prec(1, /[^{"\\\n]+/)),
+
     interpolated_verbatim_string_text: $ => choice(
       '{{',
-      /[^{"]+/,
+      $._interpolated_verbatim_string_text_fragment,
       '""'
     ),
+
+    _interpolated_verbatim_string_text_fragment: $ => token.immediate(prec(1, /[^{"]+/)),
 
     interpolation: $ => seq(
       '{',
@@ -1313,7 +1321,7 @@ module.exports = grammar({
 
     query_continuation: $ => seq('into', $.identifier, $._query_body),
 
-    range_expression: $ => prec.right(seq(
+    range_expression: $ => prec.right(PREC.RANGE, seq(
       optional($._expression),
       '..',
       optional($._expression)
@@ -1350,7 +1358,7 @@ module.exports = grammar({
       optional($.initializer_expression)
     ),
 
-    switch_expression: $ => prec(PREC.UNARY, seq(
+    switch_expression: $ => prec(PREC.SWITCH, seq(
       $._expression,
       'switch',
       '{',
@@ -1380,7 +1388,8 @@ module.exports = grammar({
 
     type_of_expression: $ => seq('typeof', '(', $._type, ')'),
 
-    with_expression: $ => seq($._expression, 'with', '{', optional($.with_initializer_expression), '}'),
+    with_expression: $ => prec.left(PREC.WITH,
+      seq($._expression, 'with', '{', optional($.with_initializer_expression), '}')),
 
     with_initializer_expression: $ => commaSep1($.simple_assignment_expression),
 
@@ -1455,15 +1464,19 @@ module.exports = grammar({
         ['==', PREC.EQUAL], // equals_expression
         ['!=', PREC.EQUAL], // not_equals_expression
         ['>=', PREC.REL], // greater_than_or_equal_expression
-        ['>', PREC.REL], //  greater_than_expression
-        ['??', PREC.TERNARY], // coalesce_expression
+        ['>', PREC.REL] //  greater_than_expression
       ].map(([operator, precedence]) =>
         prec.left(precedence, seq(
           field('left', $._expression),
           field('operator', operator),
           field('right', $._expression)
         ))
-      )
+      ),
+      prec.right(PREC.COALESCING, seq(
+        field('left', $._expression),
+        field('operator', '??'), // coalesce_expression
+        field('right', $._expression)
+      ))
     ),
 
     as_expression: $ => prec.left(PREC.EQUAL, seq(
@@ -1478,7 +1491,8 @@ module.exports = grammar({
       field('right', $._type)
     )),
 
-    _identifier_token: $ => token(seq(optional('@'), /[a-zA-Zα-ωΑ-Ωµ_][a-zA-Zα-ωΑ-Ωµ_0-9]*/)), // identifier_token in Roslyn
+    // Unicode categories: L = Letter, Nl Letter_Number, = Nd = Decimal_Number, Pc = Connector_Punctuation, Cf = Format, Mn = Nonspacing_Mark, Mc = Spacing_Mark
+    _identifier_token: $ => token(seq(optional('@'), /[\p{L}\p{Nl}_][\p{L}\p{Nl}\p{Nd}\p{Pc}\p{Cf}\p{Mn}\p{Mc}]*/)),
     identifier: $ => choice($._identifier_token, $._contextual_keywords),
 
     global: $ => 'global',
@@ -1559,11 +1573,13 @@ module.exports = grammar({
     string_literal: $ => seq(
       '"',
       repeat(choice(
-        token.immediate(prec(1, /[^"\\\n]+/)),
+        $._string_literal_fragment,
         $.escape_sequence
       )),
       '"'
     ),
+
+    _string_literal_fragment: $ => token.immediate(prec(1, /[^"\\\n]+/)),
 
     verbatim_string_literal: $ => token(seq(
       '@"',
@@ -1577,14 +1593,11 @@ module.exports = grammar({
     // Comments
 
     comment: $ => token(choice(
-      seq('//', /.*/),
+      seq('//', /[^\n\r]*/),
       seq(
         '/*',
-        repeat(choice(
-          /[^*]/,
-          /\*[^/]/
-        )),
-        '*/'
+        /[^*]*\*+([^/*][^*]*\*+)*/,
+        '/'
       )
     )),
 
@@ -1632,17 +1645,107 @@ module.exports = grammar({
     return_type: $ => choice($._type, $.void_keyword),
     void_keyword: $ => 'void',
 
-    preprocessor_call: $ => seq(
-      $.preprocessor_directive,
-      repeat(choice(
-        $.identifier,
-        $._literal,
-        token(prec(-1, /[^\s]+/))
-      )),
+    _preprocessor_call: $ => seq(
+      $._preproc_directive_start,
+      choice(
+        $.nullable_directive,
+        $.define_directive,
+        $.undef_directive,
+        $.if_directive,
+        $.else_directive,
+        $.elif_directive,
+        $.endif_directive,
+        $.region_directive,
+        $.endregion_directive,
+        $.error_directive,
+        $.warning_directive,
+        $.line_directive,
+        $.pragma_directive
+      ),
       $._preproc_directive_end
     ),
 
-    preprocessor_directive: $ => /#[ \t]*[a-z]\w*/,
+    _preproc_directive_start: $ => /#[ \t]*/,
+
+    nullable_directive: $ => seq(
+      'nullable',
+      choice('disable', 'enable', 'restore'),
+      optional(choice('annotations', 'warnings'))
+    ),
+
+    // Preprocessor
+
+    define_directive: $ => seq('define', $.identifier),
+    undef_directive: $ => seq('undef', $.identifier),
+    if_directive: $ => seq('if', $._preproc_expression),
+    else_directive: $ => 'else',
+    elif_directive: $ => seq('elif', $._preproc_expression),
+    endif_directive: $ => 'endif',
+    region_directive: $ => seq('region', optional($.preproc_message)),
+    endregion_directive: $ => seq('endregion', optional($.preproc_message)),
+    error_directive: $ => seq('error', $.preproc_message),
+    warning_directive: $ => seq('warning', $.preproc_message),
+    line_directive: $ => seq('line',
+      choice(
+        'default',
+        'hidden',
+        seq($.preproc_integer_literal, optional($.preproc_string_literal))
+      )
+    ),
+    pragma_directive: $ => seq('pragma',
+      choice(
+        seq('warning',
+          choice('disable', 'restore'),
+          commaSep(
+            choice(
+              $.identifier,
+              alias($.preproc_integer_literal, $.integer_literal),
+            ))),
+        seq('checksum', $.preproc_string_literal, $.preproc_string_literal, $.preproc_string_literal)
+      )
+    ),
+
+    preproc_message: $ => /[^\n\r]+/,
+    preproc_integer_literal: $ => /[0-9]+/,
+    preproc_string_literal: $ => /"[^"]*"/,
+
+    _preproc_expression: $ => choice(
+      $.identifier,
+      $.boolean_literal,
+      alias($.preproc_integer_literal, $.integer_literal),
+      alias($.preproc_string_literal, $.verbatim_string_literal),
+      alias($.preproc_unary_expression, $.prefix_unary_expression),
+      alias($.preproc_binary_expression, $.binary_expression),
+      alias($.preproc_parenthesized_expression, $.parenthesized_expression)
+    ),
+
+    preproc_parenthesized_expression: $ => seq(
+      '(',
+      $._preproc_expression,
+      ')'
+    ),
+
+    preproc_unary_expression: $ => prec.left(PREC.UNARY, seq(
+      field('operator', '!'),
+      field('argument', $._preproc_expression)
+    )),
+
+    preproc_binary_expression: $ => {
+      const table = [
+        ['||', PREC.LOGOR],
+        ['&&', PREC.LOGAND],
+        ['==', PREC.EQUAL],
+        ['!=', PREC.EQUAL],
+      ];
+
+      return choice(...table.map(([operator, precedence]) => {
+        return prec.left(precedence, seq(
+          field('left', $._preproc_expression),
+          field('operator', operator),
+          field('right', $._preproc_expression)
+        ))
+      }));
+    },
   }
 })
 
