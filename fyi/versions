@@ -24,16 +24,13 @@ Last change in file:
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 95b92665611523c66ea971d603de853e2f7e88d1
+Latest commit in repo: 58fd82cf1a47ee6394ee28b078368630ed93f531
 Last change in file:
-  commit 8e3333ae6d72231d2f422233e3bcc1be6fc0e02d
+  commit 2f60412b9a96ab58f246345f5391e788cbd0ea4d
   Author: Sjoerd Langkemper <sjoerd-github@linuxonly.nl>
-  Date:   Thu Jun 24 15:55:23 2021 +0200
+  Date:   Mon Aug 16 13:23:03 2021 +0200
   
-      Support parameter ellipsis
+      Support ellipsis as declarations
       
-      Parameters in method definitions can be ellipsis. Since elllipsis can now be
-      expressions and parameters, we add a conflict rule.
-      
-      Related to https://github.com/returntocorp/semgrep/issues/3289
+      Related to https://github.com/returntocorp/semgrep/issues/3702
 ---

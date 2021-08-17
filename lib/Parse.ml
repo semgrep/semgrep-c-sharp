@@ -2810,6 +2810,7 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Name "record_declaration");
       Token (Name "struct_declaration");
       Token (Name "using_directive");
+      Token (Name "ellipsis");
     |];
   );
   "declaration_list",
@@ -8972,6 +8973,10 @@ and trans_declaration ((kind, body) : mt) : CST.declaration =
       | Alt (17, v) ->
           `Using_dire (
             trans_using_directive (Run.matcher_token v)
+          )
+      | Alt (18, v) ->
+          `Ellips (
+            trans_ellipsis (Run.matcher_token v)
           )
       | _ -> assert false
       )

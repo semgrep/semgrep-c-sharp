@@ -1573,6 +1573,7 @@ and declaration = [
   | `Record_decl of record_declaration
   | `Struct_decl of struct_declaration
   | `Using_dire of using_directive
+  | `Ellips of Token.t (* "..." *)
 ]
 
 and declaration_list = (
