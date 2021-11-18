@@ -994,6 +994,7 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Name "literal");
       Token (Name "ellipsis");
       Token (Name "deep_ellipsis");
+      Token (Name "member_access_ellipsis_expression");
     |];
   );
   "expression_statement",
@@ -1466,6 +1467,21 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal "(");
       Token (Name "expression");
       Token (Literal ")");
+    ];
+  );
+  "member_access_ellipsis_expression",
+  Some (
+    Seq [
+      Alt [|
+        Token (Name "expression");
+        Token (Name "predefined_type");
+        Token (Name "name");
+      |];
+      Alt [|
+        Token (Literal ".");
+        Token (Literal "->");
+      |];
+      Token (Name "ellipsis");
     ];
   );
   "member_access_expression",
@@ -5289,6 +5305,10 @@ and trans_expression ((kind, body) : mt) : CST.expression =
           `Deep_ellips (
             trans_deep_ellipsis (Run.matcher_token v)
           )
+      | Alt (47, v) ->
+          `Member_access_ellips_exp (
+            trans_member_access_ellipsis_expression (Run.matcher_token v)
+          )
       | _ -> assert false
       )
   | Leaf _ -> assert false
@@ -6213,6 +6233,46 @@ and trans_make_ref_expression ((kind, body) : mt) : CST.make_ref_expression =
             Run.trans_token (Run.matcher_token v1),
             trans_expression (Run.matcher_token v2),
             Run.trans_token (Run.matcher_token v3)
+          )
+      | _ -> assert false
+      )
+  | Leaf _ -> assert false
+
+and trans_member_access_ellipsis_expression ((kind, body) : mt) : CST.member_access_ellipsis_expression =
+  match body with
+  | Children v ->
+      (match v with
+      | Seq [v0; v1; v2] ->
+          (
+            (match v0 with
+            | Alt (0, v) ->
+                `Exp (
+                  trans_expression (Run.matcher_token v)
+                )
+            | Alt (1, v) ->
+                `Pred_type (
+                  trans_predefined_type (Run.matcher_token v)
+                )
+            | Alt (2, v) ->
+                `Name (
+                  trans_name (Run.matcher_token v)
+                )
+            | _ -> assert false
+            )
+            ,
+            (match v1 with
+            | Alt (0, v) ->
+                `DOT (
+                  Run.trans_token (Run.matcher_token v)
+                )
+            | Alt (1, v) ->
+                `DASHGT (
+                  Run.trans_token (Run.matcher_token v)
+                )
+            | _ -> assert false
+            )
+            ,
+            trans_ellipsis (Run.matcher_token v2)
           )
       | _ -> assert false
       )
