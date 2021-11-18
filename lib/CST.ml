@@ -8,81 +8,53 @@
 open! Sexplib.Conv
 open Tree_sitter_run
 
-type preproc_directive_end = Token.t
+type identifier_token = Token.t
 [@@deriving sexp_of]
 
-type interpolated_verbatim_string_text_fragment =
-  Token.t (* pattern "[^{\"]+" *)
-[@@deriving sexp_of]
-
-type assignment_operator = [
-    `EQ of Token.t (* "=" *)
-  | `PLUSEQ of Token.t (* "+=" *)
-  | `DASHEQ of Token.t (* "-=" *)
-  | `STAREQ of Token.t (* "*=" *)
-  | `SLASHEQ of Token.t (* "/=" *)
-  | `PERCEQ of Token.t (* "%=" *)
-  | `AMPEQ of Token.t (* "&=" *)
-  | `HATEQ of Token.t (* "^=" *)
-  | `BAREQ of Token.t (* "|=" *)
-  | `LTLTEQ of Token.t (* "<<=" *)
-  | `GTGTEQ of Token.t (* ">>=" *)
-  | `QMARKQMARKEQ of Token.t (* "??=" *)
+type modifier = [
+    `Abst of Token.t (* "abstract" *)
+  | `Async of Token.t (* "async" *)
+  | `Const of Token.t (* "const" *)
+  | `Extern of Token.t (* "extern" *)
+  | `Fixed of Token.t (* "fixed" *)
+  | `Inte of Token.t (* "internal" *)
+  | `New of Token.t (* "new" *)
+  | `Over of Token.t (* "override" *)
+  | `Part of Token.t (* "partial" *)
+  | `Priv of Token.t (* "private" *)
+  | `Prot of Token.t (* "protected" *)
+  | `Public of Token.t (* "public" *)
+  | `Read of Token.t (* "readonly" *)
+  | `Ref of Token.t (* "ref" *)
+  | `Sealed of Token.t (* "sealed" *)
+  | `Static of Token.t (* "static" *)
+  | `Unsafe of Token.t (* "unsafe" *)
+  | `Virt of Token.t (* "virtual" *)
+  | `Vola of Token.t (* "volatile" *)
 ]
 [@@deriving sexp_of]
 
-type preproc_integer_literal = Token.t (* pattern [0-9]+ *)
-[@@deriving sexp_of]
-
-type integer_literal = Token.t
-[@@deriving sexp_of]
-
-type escape_sequence = Token.t
+type verbatim_string_literal = Token.t
 [@@deriving sexp_of]
 
 type interpolated_string_text_fragment =
   Token.t (* pattern "[^{\"\\\\\\n]+" *)
 [@@deriving sexp_of]
 
-type preproc_string_literal = Token.t (* pattern "\"[^\"]*\"" *)
+type preproc_directive_start = Token.t (* pattern #[ \t]* *)
 [@@deriving sexp_of]
 
-type verbatim_string_literal = Token.t
-[@@deriving sexp_of]
-
-type parameter_modifier = [
-    `Ref of Token.t (* "ref" *)
-  | `Out of Token.t (* "out" *)
-  | `This of Token.t (* "this" *)
-  | `In of Token.t (* "in" *)
-]
-[@@deriving sexp_of]
-
-type nullable_directive = (
-    Token.t (* "nullable" *)
-  * [
-        `Disa of Token.t (* "disable" *)
-      | `Enable of Token.t (* "enable" *)
-      | `Rest of Token.t (* "restore" *)
-    ]
-  * [
-        `Annots of Token.t (* "annotations" *)
-      | `Warnis of Token.t (* "warnings" *)
-    ]
-      option
-)
+type real_literal = Token.t
 [@@deriving sexp_of]
 
 type predefined_type = Token.t
 [@@deriving sexp_of]
 
-type preproc_directive_start = Token.t (* pattern #[ \t]* *)
+type interpolated_verbatim_string_text_fragment =
+  Token.t (* pattern "[^{\"]+" *)
 [@@deriving sexp_of]
 
-type imm_tok_pat_684220d = Token.t (* pattern "[^'\\\\]" *)
-[@@deriving sexp_of]
-
-type default_switch_label = (Token.t (* "default" *) * Token.t (* ":" *))
+type preproc_message = Token.t (* pattern [^\n\r]+ *)
 [@@deriving sexp_of]
 
 type overloadable_operator = [
@@ -111,47 +83,6 @@ type overloadable_operator = [
 ]
 [@@deriving sexp_of]
 
-type pat_52ffbd7 = Token.t (* pattern "[^}\"]+" *)
-[@@deriving sexp_of]
-
-type semgrep_metavariable = Token.t
-[@@deriving sexp_of]
-
-type string_literal_fragment = Token.t (* pattern "[^\"\\\\\\n]+" *)
-[@@deriving sexp_of]
-
-type boolean_literal = [
-    `True of Token.t (* "true" *)
-  | `False of Token.t (* "false" *)
-]
-[@@deriving sexp_of]
-
-type modifier = [
-    `Abst of Token.t (* "abstract" *)
-  | `Async of Token.t (* "async" *)
-  | `Const of Token.t (* "const" *)
-  | `Extern of Token.t (* "extern" *)
-  | `Fixed of Token.t (* "fixed" *)
-  | `Inte of Token.t (* "internal" *)
-  | `New of Token.t (* "new" *)
-  | `Over of Token.t (* "override" *)
-  | `Part of Token.t (* "partial" *)
-  | `Priv of Token.t (* "private" *)
-  | `Prot of Token.t (* "protected" *)
-  | `Public of Token.t (* "public" *)
-  | `Read of Token.t (* "readonly" *)
-  | `Ref of Token.t (* "ref" *)
-  | `Sealed of Token.t (* "sealed" *)
-  | `Static of Token.t (* "static" *)
-  | `Unsafe of Token.t (* "unsafe" *)
-  | `Virt of Token.t (* "virtual" *)
-  | `Vola of Token.t (* "volatile" *)
-]
-[@@deriving sexp_of]
-
-type preproc_message = Token.t (* pattern [^\n\r]+ *)
-[@@deriving sexp_of]
-
 type attribute_target_specifier = (
     [
         `Field of Token.t (* "field" *)
@@ -166,10 +97,48 @@ type attribute_target_specifier = (
 )
 [@@deriving sexp_of]
 
-type real_literal = Token.t
+type parameter_modifier = [
+    `Ref of Token.t (* "ref" *)
+  | `Out of Token.t (* "out" *)
+  | `This of Token.t (* "this" *)
+  | `In of Token.t (* "in" *)
+]
 [@@deriving sexp_of]
 
-type identifier_token = Token.t
+type string_literal_fragment = Token.t (* pattern "[^\"\\\\\\n]+" *)
+[@@deriving sexp_of]
+
+type imm_tok_pat_684220d = Token.t (* pattern "[^'\\\\]" *)
+[@@deriving sexp_of]
+
+type preproc_directive_end = Token.t
+[@@deriving sexp_of]
+
+type pat_52ffbd7 = Token.t (* pattern "[^}\"]+" *)
+[@@deriving sexp_of]
+
+type anon_choice_DOT_2ad1dab = [
+    `DOT of Token.t (* "." *)
+  | `DASHGT of Token.t (* "->" *)
+]
+[@@deriving sexp_of]
+
+type default_switch_label = (Token.t (* "default" *) * Token.t (* ":" *))
+[@@deriving sexp_of]
+
+type nullable_directive = (
+    Token.t (* "nullable" *)
+  * [
+        `Disa of Token.t (* "disable" *)
+      | `Enable of Token.t (* "enable" *)
+      | `Rest of Token.t (* "restore" *)
+    ]
+  * [
+        `Annots of Token.t (* "annotations" *)
+      | `Warnis of Token.t (* "warnings" *)
+    ]
+      option
+)
 [@@deriving sexp_of]
 
 type contextual_keywords = [
@@ -201,11 +170,78 @@ type contextual_keywords = [
 ]
 [@@deriving sexp_of]
 
+type semgrep_metavariable = Token.t
+[@@deriving sexp_of]
+
+type integer_literal = Token.t
+[@@deriving sexp_of]
+
+type preproc_string_literal = Token.t (* pattern "\"[^\"]*\"" *)
+[@@deriving sexp_of]
+
+type boolean_literal = [
+    `True of Token.t (* "true" *)
+  | `False of Token.t (* "false" *)
+]
+[@@deriving sexp_of]
+
+type escape_sequence = Token.t
+[@@deriving sexp_of]
+
+type preproc_integer_literal = Token.t (* pattern [0-9]+ *)
+[@@deriving sexp_of]
+
+type assignment_operator = [
+    `EQ of Token.t (* "=" *)
+  | `PLUSEQ of Token.t (* "+=" *)
+  | `DASHEQ of Token.t (* "-=" *)
+  | `STAREQ of Token.t (* "*=" *)
+  | `SLASHEQ of Token.t (* "/=" *)
+  | `PERCEQ of Token.t (* "%=" *)
+  | `AMPEQ of Token.t (* "&=" *)
+  | `HATEQ of Token.t (* "^=" *)
+  | `BAREQ of Token.t (* "|=" *)
+  | `LTLTEQ of Token.t (* "<<=" *)
+  | `GTGTEQ of Token.t (* ">>=" *)
+  | `QMARKQMARKEQ of Token.t (* "??=" *)
+]
+[@@deriving sexp_of]
+
 type interpolated_verbatim_string_text = [
     `LCURLLCURL of Token.t (* "{{" *)
   | `Inte_verb_str_text_frag of
       interpolated_verbatim_string_text_fragment (*tok*)
   | `DQUOTDQUOT of Token.t (* "\"\"" *)
+]
+[@@deriving sexp_of]
+
+type warning_directive = (Token.t (* "warning" *) * preproc_message (*tok*))
+[@@deriving sexp_of]
+
+type error_directive = (Token.t (* "error" *) * preproc_message (*tok*))
+[@@deriving sexp_of]
+
+type endregion_directive = (
+    Token.t (* "endregion" *)
+  * preproc_message (*tok*) option
+)
+[@@deriving sexp_of]
+
+type region_directive = (
+    Token.t (* "region" *)
+  * preproc_message (*tok*) option
+)
+[@@deriving sexp_of]
+
+type interpolation_format_clause = (Token.t (* ":" *) * pat_52ffbd7 (*tok*))
+[@@deriving sexp_of]
+
+type identifier = [
+    `Choice_id_tok of [
+        `Id_tok of identifier_token (*tok*)
+      | `Cont_keywos of contextual_keywords
+    ]
+  | `Semg_meta of semgrep_metavariable (*tok*)
 ]
 [@@deriving sexp_of]
 
@@ -227,85 +263,6 @@ type line_directive = (
         )
     ]
 )
-[@@deriving sexp_of]
-
-type interpolation_format_clause = (Token.t (* ":" *) * pat_52ffbd7 (*tok*))
-[@@deriving sexp_of]
-
-type warning_directive = (Token.t (* "warning" *) * preproc_message (*tok*))
-[@@deriving sexp_of]
-
-type region_directive = (
-    Token.t (* "region" *)
-  * preproc_message (*tok*) option
-)
-[@@deriving sexp_of]
-
-type endregion_directive = (
-    Token.t (* "endregion" *)
-  * preproc_message (*tok*) option
-)
-[@@deriving sexp_of]
-
-type error_directive = (Token.t (* "error" *) * preproc_message (*tok*))
-[@@deriving sexp_of]
-
-type identifier = [
-    `Choice_id_tok of [
-        `Id_tok of identifier_token (*tok*)
-      | `Cont_keywos of contextual_keywords
-    ]
-  | `Semg_meta of semgrep_metavariable (*tok*)
-]
-[@@deriving sexp_of]
-
-type literal = [
-    `Null_lit of Token.t (* "null" *)
-  | `Bool_lit of boolean_literal
-  | `Char_lit of (
-        Token.t (* "'" *)
-      * [
-            `Imm_tok_pat_684220d of imm_tok_pat_684220d (*tok*)
-          | `Esc_seq of escape_sequence (*tok*)
-        ]
-      * Token.t (* "'" *)
-    )
-  | `Real_lit of real_literal (*tok*)
-  | `Int_lit of integer_literal (*tok*)
-  | `Str_lit of (
-        Token.t (* "\"" *)
-      * [
-            `Str_lit_frag of string_literal_fragment (*tok*)
-          | `Esc_seq of escape_sequence (*tok*)
-        ]
-          list (* zero or more *)
-      * Token.t (* "\"" *)
-    )
-  | `Verb_str_lit of verbatim_string_literal (*tok*)
-]
-[@@deriving sexp_of]
-
-type identifier_or_global = [
-    `Global of Token.t (* "global" *)
-  | `Id of identifier
-]
-[@@deriving sexp_of]
-
-type anon_choice_id_c036834 = [
-    `Id of identifier
-  | `Disc of Token.t (* "_" *)
-  | `Tuple_pat of tuple_pattern
-]
-
-and tuple_pattern = (
-    Token.t (* "(" *)
-  * anon_choice_id_c036834
-  * (Token.t (* "," *) * anon_choice_id_c036834) list (* zero or more *)
-  * Token.t (* ")" *)
-)
-[@@deriving sexp_of]
-
-type join_into_clause = (Token.t (* "into" *) * identifier)
 [@@deriving sexp_of]
 
 type preproc_binary_expression = [
@@ -336,6 +293,32 @@ and preproc_expression = [
 ]
 [@@deriving sexp_of]
 
+type define_directive = (Token.t (* "define" *) * identifier)
+[@@deriving sexp_of]
+
+type anon_choice_id_c290f8e = [
+    `Id of identifier
+  | `Prep_int_lit of preproc_integer_literal (*tok*)
+]
+[@@deriving sexp_of]
+
+type anon_choice_id_c036834 = [
+    `Id of identifier
+  | `Disc of Token.t (* "_" *)
+  | `Tuple_pat of tuple_pattern
+]
+
+and tuple_pattern = (
+    Token.t (* "(" *)
+  * anon_choice_id_c036834
+  * (Token.t (* "," *) * anon_choice_id_c036834) list (* zero or more *)
+  * Token.t (* ")" *)
+)
+[@@deriving sexp_of]
+
+type undef_directive = (Token.t (* "undef" *) * identifier)
+[@@deriving sexp_of]
+
 type variable_designation = [
     `Disc of Token.t (* "_" *)
   | `Paren_var_desi of (
@@ -361,16 +344,13 @@ type function_pointer_unmanaged_calling_convention = [
 ]
 [@@deriving sexp_of]
 
-type anon_choice_id_c290f8e = [
-    `Id of identifier
-  | `Prep_int_lit of preproc_integer_literal (*tok*)
+type join_into_clause = (Token.t (* "into" *) * identifier)
+[@@deriving sexp_of]
+
+type identifier_or_global = [
+    `Global of Token.t (* "global" *)
+  | `Id of identifier
 ]
-[@@deriving sexp_of]
-
-type define_directive = (Token.t (* "define" *) * identifier)
-[@@deriving sexp_of]
-
-type undef_directive = (Token.t (* "undef" *) * identifier)
 [@@deriving sexp_of]
 
 type extern_alias_directive = (
@@ -379,15 +359,29 @@ type extern_alias_directive = (
 )
 [@@deriving sexp_of]
 
-type name_colon = (identifier_or_global * Token.t (* ":" *))
-[@@deriving sexp_of]
-
-type name_equals = (identifier_or_global * Token.t (* "=" *))
-[@@deriving sexp_of]
-
-type anon_choice_id_bf14316 = [
-    `Id of identifier
-  | `Tuple_pat of tuple_pattern
+type literal = [
+    `Null_lit of Token.t (* "null" *)
+  | `Bool_lit of boolean_literal
+  | `Char_lit of (
+        Token.t (* "'" *)
+      * [
+            `Imm_tok_pat_684220d of imm_tok_pat_684220d (*tok*)
+          | `Esc_seq of escape_sequence (*tok*)
+        ]
+      * Token.t (* "'" *)
+    )
+  | `Real_lit of real_literal (*tok*)
+  | `Int_lit of integer_literal (*tok*)
+  | `Str_lit of (
+        Token.t (* "\"" *)
+      * [
+            `Str_lit_frag of string_literal_fragment (*tok*)
+          | `Esc_seq of escape_sequence (*tok*)
+        ]
+          list (* zero or more *)
+      * Token.t (* "\"" *)
+    )
+  | `Verb_str_lit of verbatim_string_literal (*tok*)
 ]
 [@@deriving sexp_of]
 
@@ -395,15 +389,6 @@ type if_directive = (Token.t (* "if" *) * preproc_expression)
 [@@deriving sexp_of]
 
 type elif_directive = (Token.t (* "elif" *) * preproc_expression)
-[@@deriving sexp_of]
-
-type function_pointer_unmanaged_calling_convention_list = (
-    Token.t (* "[" *)
-  * function_pointer_unmanaged_calling_convention
-  * (Token.t (* "," *) * function_pointer_unmanaged_calling_convention)
-      list (* zero or more *)
-  * Token.t (* "]" *)
-)
 [@@deriving sexp_of]
 
 type pragma_directive = (
@@ -430,6 +415,27 @@ type pragma_directive = (
 )
 [@@deriving sexp_of]
 
+type anon_choice_id_bf14316 = [
+    `Id of identifier
+  | `Tuple_pat of tuple_pattern
+]
+[@@deriving sexp_of]
+
+type function_pointer_unmanaged_calling_convention_list = (
+    Token.t (* "[" *)
+  * function_pointer_unmanaged_calling_convention
+  * (Token.t (* "," *) * function_pointer_unmanaged_calling_convention)
+      list (* zero or more *)
+  * Token.t (* "]" *)
+)
+[@@deriving sexp_of]
+
+type name_equals = (identifier_or_global * Token.t (* "=" *))
+[@@deriving sexp_of]
+
+type name_colon = (identifier_or_global * Token.t (* ":" *))
+[@@deriving sexp_of]
+
 type function_pointer_calling_convention = [
     `Mana of Token.t (* "managed" *)
   | `Unma_opt_func_poin_unma_call_conv_list of (
@@ -439,7 +445,13 @@ type function_pointer_calling_convention = [
 ]
 [@@deriving sexp_of]
 
-type anon_choice_param_ce11a32 = [
+type anon_choice_cst_pat_3bb8381 = [
+    `Exp of constant_pattern
+  | `Pred_type of predefined_type (*tok*)
+  | `Name of name
+]
+
+and anon_choice_param_ce11a32 = [
     `Param of parameter
   | `Param_array of (
         attribute_list list (* zero or more *)
@@ -720,13 +732,7 @@ and expression = [
       * Token.t (* ")" *)
     )
   | `Member_access_exp of (
-        [
-            `Exp of constant_pattern
-          | `Pred_type of predefined_type (*tok*)
-          | `Name of name
-        ]
-      * [ `DOT of Token.t (* "." *) | `DASHGT of Token.t (* "->" *) ]
-      * simple_name
+        anon_choice_cst_pat_3bb8381 * anon_choice_DOT_2ad1dab * simple_name
     )
   | `Obj_crea_exp of (
         Token.t (* "new" *)
@@ -793,6 +799,10 @@ and expression = [
   | `Ellips of Token.t (* "..." *)
   | `Deep_ellips of (
         Token.t (* "<..." *) * constant_pattern * Token.t (* "...>" *)
+    )
+  | `Member_access_ellips_exp of (
+        anon_choice_cst_pat_3bb8381 * anon_choice_DOT_2ad1dab
+      * Token.t (* "..." *)
     )
 ]
 
@@ -1320,10 +1330,40 @@ and with_initializer_expression = (
 )
 [@@deriving sexp_of]
 
-type constructor_initializer = (
-    Token.t (* ":" *)
-  * [ `Base of Token.t (* "base" *) | `This of Token.t (* "this" *) ]
-  * argument_list
+type global_attribute_list = (
+    Token.t (* "[" *)
+  * [ `Asse of Token.t (* "assembly" *) | `Module of Token.t (* "module" *) ]
+  * Token.t (* ":" *)
+  * (attribute * (Token.t (* "," *) * attribute) list (* zero or more *))
+      option
+  * Token.t (* "]" *)
+)
+[@@deriving sexp_of]
+
+type primary_constructor_base_type = (identifier * argument_list)
+[@@deriving sexp_of]
+
+type bracketed_parameter_list = (
+    Token.t (* "[" *)
+  * parameter
+  * (Token.t (* "," *) * parameter) list (* zero or more *)
+  * Token.t (* "]" *)
+)
+[@@deriving sexp_of]
+
+type enum_member_declaration = (
+    attribute_list list (* zero or more *)
+  * identifier
+  * equals_value_clause option
+)
+[@@deriving sexp_of]
+
+type using_directive = (
+    Token.t (* "using" *)
+  * [ `Static of Token.t (* "static" *) | `Name_equals of name_equals ]
+      option
+  * name
+  * Token.t (* ";" *)
 )
 [@@deriving sexp_of]
 
@@ -1340,34 +1380,14 @@ type delegate_declaration = (
 )
 [@@deriving sexp_of]
 
-type global_attribute_list = (
-    Token.t (* "[" *)
-  * [ `Asse of Token.t (* "assembly" *) | `Module of Token.t (* "module" *) ]
-  * Token.t (* ":" *)
-  * (attribute * (Token.t (* "," *) * attribute) list (* zero or more *))
-      option
-  * Token.t (* "]" *)
-)
-[@@deriving sexp_of]
-
-type using_directive = (
-    Token.t (* "using" *)
-  * [ `Static of Token.t (* "static" *) | `Name_equals of name_equals ]
-      option
-  * name
-  * Token.t (* ";" *)
+type base_list = (
+    Token.t (* ":" *)
+  * type_pattern
+  * (Token.t (* "," *) * type_pattern) list (* zero or more *)
 )
 [@@deriving sexp_of]
 
 type explicit_interface_specifier = (name * Token.t (* "." *))
-[@@deriving sexp_of]
-
-type bracketed_parameter_list = (
-    Token.t (* "[" *)
-  * parameter
-  * (Token.t (* "," *) * parameter) list (* zero or more *)
-  * Token.t (* "]" *)
-)
 [@@deriving sexp_of]
 
 type accessor_declaration = (
@@ -1385,39 +1405,10 @@ type accessor_declaration = (
 )
 [@@deriving sexp_of]
 
-type base_list = (
+type constructor_initializer = (
     Token.t (* ":" *)
-  * type_pattern
-  * (Token.t (* "," *) * type_pattern) list (* zero or more *)
-)
-[@@deriving sexp_of]
-
-type enum_member_declaration = (
-    attribute_list list (* zero or more *)
-  * identifier
-  * equals_value_clause option
-)
-[@@deriving sexp_of]
-
-type primary_constructor_base_type = (identifier * argument_list)
-[@@deriving sexp_of]
-
-type accessor_list = (
-    Token.t (* "{" *)
-  * accessor_declaration list (* zero or more *)
-  * Token.t (* "}" *)
-)
-[@@deriving sexp_of]
-
-type enum_member_declaration_list = (
-    Token.t (* "{" *)
-  * (
-        enum_member_declaration
-      * (Token.t (* "," *) * enum_member_declaration) list (* zero or more *)
-    )
-      option
-  * Token.t (* "," *) option
-  * Token.t (* "}" *)
+  * [ `Base of Token.t (* "base" *) | `This of Token.t (* "this" *) ]
+  * argument_list
 )
 [@@deriving sexp_of]
 
@@ -1438,6 +1429,25 @@ type record_base = [
           option
     )
 ]
+[@@deriving sexp_of]
+
+type enum_member_declaration_list = (
+    Token.t (* "{" *)
+  * (
+        enum_member_declaration
+      * (Token.t (* "," *) * enum_member_declaration) list (* zero or more *)
+    )
+      option
+  * Token.t (* "," *) option
+  * Token.t (* "}" *)
+)
+[@@deriving sexp_of]
+
+type accessor_list = (
+    Token.t (* "{" *)
+  * accessor_declaration list (* zero or more *)
+  * Token.t (* "}" *)
+)
 [@@deriving sexp_of]
 
 type enum_declaration = (
@@ -1659,41 +1669,24 @@ type compilation_unit = [
 ]
 [@@deriving sexp_of]
 
-type endif_directive (* inlined *) = Token.t (* "endif" *)
-[@@deriving sexp_of]
-
 type constructor_constraint (* inlined *) = (
     Token.t (* "new" *) * Token.t (* "(" *) * Token.t (* ")" *)
 )
 [@@deriving sexp_of]
 
-type else_directive (* inlined *) = Token.t (* "else" *)
+type empty_statement (* inlined *) = Token.t (* ";" *)
+[@@deriving sexp_of]
+
+type implicit_type (* inlined *) = Token.t (* "var" *)
+[@@deriving sexp_of]
+
+type ellipsis (* inlined *) = Token.t (* "..." *)
 [@@deriving sexp_of]
 
 type void_keyword (* inlined *) = Token.t (* "void" *)
 [@@deriving sexp_of]
 
-type comment (* inlined *) = Token.t
-[@@deriving sexp_of]
-
-type discard (* inlined *) = Token.t (* "_" *)
-[@@deriving sexp_of]
-
-type empty_statement (* inlined *) = Token.t (* ";" *)
-[@@deriving sexp_of]
-
-type break_statement (* inlined *) = (
-    Token.t (* "break" *) * Token.t (* ";" *)
-)
-[@@deriving sexp_of]
-
-type base_expression (* inlined *) = Token.t (* "base" *)
-[@@deriving sexp_of]
-
-type this_expression (* inlined *) = Token.t (* "this" *)
-[@@deriving sexp_of]
-
-type implicit_type (* inlined *) = Token.t (* "var" *)
+type else_directive (* inlined *) = Token.t (* "else" *)
 [@@deriving sexp_of]
 
 type global (* inlined *) = Token.t (* "global" *)
@@ -1707,7 +1700,24 @@ type continue_statement (* inlined *) = (
 )
 [@@deriving sexp_of]
 
-type ellipsis (* inlined *) = Token.t (* "..." *)
+type discard (* inlined *) = Token.t (* "_" *)
+[@@deriving sexp_of]
+
+type this_expression (* inlined *) = Token.t (* "this" *)
+[@@deriving sexp_of]
+
+type comment (* inlined *) = Token.t
+[@@deriving sexp_of]
+
+type endif_directive (* inlined *) = Token.t (* "endif" *)
+[@@deriving sexp_of]
+
+type base_expression (* inlined *) = Token.t (* "base" *)
+[@@deriving sexp_of]
+
+type break_statement (* inlined *) = (
+    Token.t (* "break" *) * Token.t (* ";" *)
+)
 [@@deriving sexp_of]
 
 type character_literal (* inlined *) = (
@@ -2063,14 +2073,14 @@ type make_ref_expression (* inlined *) = (
 )
 [@@deriving sexp_of]
 
+type member_access_ellipsis_expression (* inlined *) = (
+    anon_choice_cst_pat_3bb8381 * anon_choice_DOT_2ad1dab
+  * Token.t (* "..." *)
+)
+[@@deriving sexp_of]
+
 type member_access_expression (* inlined *) = (
-    [
-        `Exp of constant_pattern
-      | `Pred_type of predefined_type (*tok*)
-      | `Name of name
-    ]
-  * [ `DOT of Token.t (* "." *) | `DASHGT of Token.t (* "->" *) ]
-  * simple_name
+    anon_choice_cst_pat_3bb8381 * anon_choice_DOT_2ad1dab * simple_name
 )
 [@@deriving sexp_of]
 
@@ -2275,19 +2285,13 @@ type yield_statement (* inlined *) = (
 )
 [@@deriving sexp_of]
 
-type ref_type (* inlined *) = (
-    Token.t (* "ref" *)
-  * Token.t (* "readonly" *) option
-  * type_pattern
-)
-[@@deriving sexp_of]
-
-type event_field_declaration (* inlined *) = (
+type destructor_declaration (* inlined *) = (
     attribute_list list (* zero or more *)
-  * modifier list (* zero or more *)
-  * Token.t (* "event" *)
-  * variable_declaration
-  * Token.t (* ";" *)
+  * Token.t (* "extern" *) option
+  * Token.t (* "~" *)
+  * identifier
+  * parameter_list
+  * function_body
 )
 [@@deriving sexp_of]
 
@@ -2313,21 +2317,6 @@ type operator_declaration (* inlined *) = (
 )
 [@@deriving sexp_of]
 
-type semgrep_expression (* inlined *) = (
-    Token.t (* "__SEMGREP_EXPRESSION" *) * constant_pattern
-)
-[@@deriving sexp_of]
-
-type destructor_declaration (* inlined *) = (
-    attribute_list list (* zero or more *)
-  * Token.t (* "extern" *) option
-  * Token.t (* "~" *)
-  * identifier
-  * parameter_list
-  * function_body
-)
-[@@deriving sexp_of]
-
 type field_declaration (* inlined *) = (
     attribute_list list (* zero or more *)
   * modifier list (* zero or more *)
@@ -2336,13 +2325,24 @@ type field_declaration (* inlined *) = (
 )
 [@@deriving sexp_of]
 
-type constructor_declaration (* inlined *) = (
+type ref_type (* inlined *) = (
+    Token.t (* "ref" *)
+  * Token.t (* "readonly" *) option
+  * type_pattern
+)
+[@@deriving sexp_of]
+
+type semgrep_expression (* inlined *) = (
+    Token.t (* "__SEMGREP_EXPRESSION" *) * constant_pattern
+)
+[@@deriving sexp_of]
+
+type event_field_declaration (* inlined *) = (
     attribute_list list (* zero or more *)
   * modifier list (* zero or more *)
-  * identifier
-  * parameter_list
-  * constructor_initializer option
-  * function_body
+  * Token.t (* "event" *)
+  * variable_declaration
+  * Token.t (* ";" *)
 )
 [@@deriving sexp_of]
 
@@ -2356,6 +2356,27 @@ type method_declaration (* inlined *) = (
   * parameter_list
   * type_parameter_constraints_clause list (* zero or more *)
   * function_body
+)
+[@@deriving sexp_of]
+
+type constructor_declaration (* inlined *) = (
+    attribute_list list (* zero or more *)
+  * modifier list (* zero or more *)
+  * identifier
+  * parameter_list
+  * constructor_initializer option
+  * function_body
+)
+[@@deriving sexp_of]
+
+type event_declaration (* inlined *) = (
+    attribute_list list (* zero or more *)
+  * modifier list (* zero or more *)
+  * Token.t (* "event" *)
+  * type_pattern
+  * explicit_interface_specifier option
+  * identifier
+  * [ `Acce_list of accessor_list | `SEMI of Token.t (* ";" *) ]
 )
 [@@deriving sexp_of]
 
@@ -2390,17 +2411,6 @@ type property_declaration (* inlined *) = (
             arrow_expression_clause * Token.t (* ";" *)
         )
     ]
-)
-[@@deriving sexp_of]
-
-type event_declaration (* inlined *) = (
-    attribute_list list (* zero or more *)
-  * modifier list (* zero or more *)
-  * Token.t (* "event" *)
-  * type_pattern
-  * explicit_interface_specifier option
-  * identifier
-  * [ `Acce_list of accessor_list | `SEMI of Token.t (* ";" *) ]
 )
 [@@deriving sexp_of]
 
