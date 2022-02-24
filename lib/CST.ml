@@ -804,6 +804,10 @@ and expression = [
         anon_choice_cst_pat_3bb8381 * anon_choice_DOT_2ad1dab
       * Token.t (* "..." *)
     )
+  | `Typed_meta of (
+        Token.t (* "(" *) * type_pattern * semgrep_metavariable (*tok*)
+      * Token.t (* ")" *)
+    )
 ]
 
 and expression_statement = [
@@ -2240,6 +2244,12 @@ type tuple_type (* inlined *) = (
 
 type type_of_expression (* inlined *) = (
     Token.t (* "typeof" *) * Token.t (* "(" *) * type_pattern
+  * Token.t (* ")" *)
+)
+[@@deriving sexp_of]
+
+type typed_metavariable (* inlined *) = (
+    Token.t (* "(" *) * type_pattern * semgrep_metavariable (*tok*)
   * Token.t (* ")" *)
 )
 [@@deriving sexp_of]
