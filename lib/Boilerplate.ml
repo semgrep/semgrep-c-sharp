@@ -1269,6 +1269,12 @@ and map_expression (env : env) (x : CST.expression) =
       let v2 = map_anon_choice_DOT_2ad1dab env v2 in
       let v3 = (* "..." *) token env v3 in
       todo env (v1, v2, v3)
+  | `Typed_meta (v1, v2, v3, v4) ->
+      let v1 = (* "(" *) token env v1 in
+      let v2 = map_type_pattern env v2 in
+      let v3 = (* semgrep_metavariable *) token env v3 in
+      let v4 = (* ")" *) token env v4 in
+      todo env (v1, v2, v3, v4)
   )
 
 and map_expression_statement (env : env) (x : CST.expression_statement) =

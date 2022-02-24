@@ -22,15 +22,15 @@ Last change in file:
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 1fccbade96ce023b5e0a6989ef43b210298bfe2f
+Latest commit in repo: 3c80b7e73254c65964690604c064d0e915762532
 Last change in file:
-  commit 1fccbade96ce023b5e0a6989ef43b210298bfe2f
+  commit 3c80b7e73254c65964690604c064d0e915762532
   Author: pad <pad@r2c.dev>
-  Date:   Thu Nov 18 14:06:16 2021 +0100
+  Date:   Thu Feb 24 10:29:31 2022 +0100
   
-      [C#] support for method chaining
+      [C#] extend grammar to support typed metavariables
       
-      This will help https://github.com/returntocorp/semgrep/issues/4300
+      This will help https://github.com/returntocorp/semgrep/issues/4657
       
       test plan:
       test file included

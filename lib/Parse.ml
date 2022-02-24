@@ -995,6 +995,7 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Name "ellipsis");
       Token (Name "deep_ellipsis");
       Token (Name "member_access_ellipsis_expression");
+      Token (Name "typed_metavariable");
     |];
   );
   "expression_statement",
@@ -2229,6 +2230,15 @@ let children_regexps : (string * Run.exp option) list = [
     ];
   );
   "type_pattern", Some (Token (Name "type"););
+  "typed_metavariable",
+  Some (
+    Seq [
+      Token (Literal "(");
+      Token (Name "type");
+      Token (Name "semgrep_metavariable");
+      Token (Literal ")");
+    ];
+  );
   "unsafe_statement",
   Some (
     Seq [
@@ -5309,6 +5319,10 @@ and trans_expression ((kind, body) : mt) : CST.expression =
           `Member_access_ellips_exp (
             trans_member_access_ellipsis_expression (Run.matcher_token v)
           )
+      | Alt (48, v) ->
+          `Typed_meta (
+            trans_typed_metavariable (Run.matcher_token v)
+          )
       | _ -> assert false
       )
   | Leaf _ -> assert false
@@ -7867,6 +7881,21 @@ and trans_type_pattern ((kind, body) : mt) : CST.type_pattern =
   match body with
   | Children v ->
       trans_type_ (Run.matcher_token v)
+  | Leaf _ -> assert false
+
+and trans_typed_metavariable ((kind, body) : mt) : CST.typed_metavariable =
+  match body with
+  | Children v ->
+      (match v with
+      | Seq [v0; v1; v2; v3] ->
+          (
+            Run.trans_token (Run.matcher_token v0),
+            trans_type_ (Run.matcher_token v1),
+            trans_semgrep_metavariable (Run.matcher_token v2),
+            Run.trans_token (Run.matcher_token v3)
+          )
+      | _ -> assert false
+      )
   | Leaf _ -> assert false
 
 and trans_unsafe_statement ((kind, body) : mt) : CST.unsafe_statement =
