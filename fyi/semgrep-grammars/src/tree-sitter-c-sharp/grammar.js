@@ -22,7 +22,6 @@ const PREC = {
   COND: 2,
   ASSIGN: 1,
   SELECT: 0,
-  TYPE_PATTERN: -2,
 };
 
 const decimalDigitSequence = /([0-9][0-9_]*[0-9]|[0-9])/;
@@ -56,10 +55,15 @@ module.exports = grammar({
     [$.nullable_type, $.is_expression, $.type_pattern],
     [$.nullable_type, $.as_expression, $.type_pattern],
 
+    [$.type_pattern, $.declaration_pattern],
+    [$.type_pattern, $.declaration_pattern, $.recursive_pattern],
+    [$.type_pattern, $.tuple_element],
+
     [$._name, $._expression],
     [$._simple_name, $.type_parameter],
     [$._simple_name, $.generic_name],
     [$._simple_name, $.constructor_declaration],
+    [$._simple_name, $.name_colon],
 
     [$.qualified_name, $.explicit_interface_specifier],
     [$.qualified_name, $.member_access_expression],
@@ -71,18 +75,26 @@ module.exports = grammar({
 
     [$._type, $.array_creation_expression],
     [$._type, $.stack_alloc_array_creation_expression],
+    [$._type, $._nullable_base_type],
+    [$._type, $._nullable_base_type, $.array_creation_expression],
+    [$._nullable_base_type, $.stack_alloc_array_creation_expression],
 
-    [$.parameter_modifier, $.this_expression],
+    [$.parameter, $.this_expression],
     [$.parameter, $._simple_name],
     [$.parameter, $.tuple_element],
     [$.parameter, $.tuple_element, $.declaration_expression],
     [$.parameter, $._pattern],
     [$.parameter, $.declaration_expression],
+
     [$.tuple_element],
     [$.tuple_element, $.declaration_expression],
     [$.tuple_element, $.variable_declarator],
 
-    [$.array_creation_expression, $.element_access_expression]
+    [$.array_creation_expression, $.element_access_expression],
+
+    [$.constant_pattern, $._name],
+    [$.constant_pattern, $._name, $._expression],
+    [$.constant_pattern, $._expression],
   ],
 
   inline: $ => [
@@ -97,8 +109,10 @@ module.exports = grammar({
       repeat($.extern_alias_directive),
       repeat($.using_directive),
       repeat($.global_attribute_list),
-      repeat($.global_statement),
-      repeat($._namespace_member_declaration)
+      choice(
+        seq(repeat($.global_statement), repeat($._namespace_member_declaration)),
+        $.file_scoped_namespace_declaration
+      )
     ),
 
     global_statement: $ => $._statement,
@@ -120,6 +134,7 @@ module.exports = grammar({
       $.operator_declaration,
       $.property_declaration,
       $.record_declaration,
+      $.record_struct_declaration,
       $.struct_declaration,
       $.using_directive,
     ),
@@ -135,12 +150,14 @@ module.exports = grammar({
       $.interface_declaration,
       $.enum_declaration,
       $.delegate_declaration,
-      $.record_declaration
+      $.record_declaration,
+      $.record_struct_declaration
     ),
 
     extern_alias_directive: $ => seq('extern', 'alias', $.identifier, ';'),
 
     using_directive: $ => seq(
+      optional('global'),
       'using',
       optional(choice(
         'static',
@@ -309,20 +326,20 @@ module.exports = grammar({
 
     _formal_parameter_list: $ => commaSep1(choice(
       $.parameter,
-      $.parameter_array
+      $._parameter_array
     )),
 
     parameter: $ => seq(
       repeat($.attribute_list),
-      optional($.parameter_modifier),
+      optional(alias(choice('ref', 'out', 'this', 'in'), $.parameter_modifier)),
       optional(field('type', $._type)),
       field('name', $.identifier),
       optional($.equals_value_clause)
     ),
 
-    parameter_modifier: $ => prec.right(choice('ref', 'out', 'this', 'in')),
+    parameter_modifier: $ => choice('ref', 'out', 'this', 'in'),
 
-    parameter_array: $ => seq(
+    _parameter_array: $ => seq(
       repeat($.attribute_list),
       'params',
       choice($.array_type, $.nullable_type),
@@ -477,7 +494,7 @@ module.exports = grammar({
       )
     ),
 
-    bracketed_parameter_list: $ => seq('[', commaSep1($.parameter), ']'),
+    bracketed_parameter_list: $ => seq('[', $._formal_parameter_list, ']'),
 
     property_declaration: $ => seq(
       repeat($.attribute_list),
@@ -580,6 +597,20 @@ module.exports = grammar({
       repeat($.attribute_list),
       repeat($.modifier),
       'record',
+      optional('class'),
+      field('name', $.identifier),
+      field('type_parameters', optional($.type_parameter_list)),
+      field('parameters', optional($.parameter_list)),
+      field('bases', optional(alias($.record_base, $.base_list))),
+      repeat($.type_parameter_constraints_clause),
+      field('body', $._record_body),
+    ),
+
+    record_struct_declaration: $ => seq(
+      repeat($.attribute_list),
+      repeat($.modifier),
+      'record',
+      'struct',
       field('name', $.identifier),
       field('type_parameters', optional($.type_parameter_list)),
       field('parameters', optional($.parameter_list)),
@@ -610,6 +641,15 @@ module.exports = grammar({
       optional(';')
     ),
 
+    file_scoped_namespace_declaration: $ => seq(
+      'namespace',
+      field('name', $._name),
+      ';',
+      repeat($.extern_alias_directive),
+      repeat($.using_directive),
+      repeat($._type_declaration)
+    ),
+
     _type: $ => choice(
       $.implicit_type,
       $.array_type,
@@ -632,14 +672,15 @@ module.exports = grammar({
     // expression but we can't match empty rules.
     array_rank_specifier: $ => seq('[', commaSep(optional($._expression)), ']'),
 
-    // When used in a nullable type, the '?' operator binds tighter than the
-    // binary operators `as` and `is`. But in a conditional expression, the `?`
-    // binds *looser*. This weird double precedence is required in order to
-    // preserve the conflict, so that `?` can be used in both ways, depending
-    // on what follows.
-    nullable_type: $ => choice(
-      prec(PREC.EQUAL + 1, seq($._type, '?')),
-      prec(PREC.COND - 1, seq($._type, '?'))
+    nullable_type: $ => seq($._nullable_base_type, '?'),
+
+    _nullable_base_type: $ => choice(
+      $.array_type,
+      $._name,
+      $.pointer_type,
+      $.function_pointer_type,
+      $.predefined_type,
+      $.tuple_type
     ),
 
     pointer_type: $ => prec(PREC.POSTFIX, seq($._type, '*')),
@@ -889,7 +930,7 @@ module.exports = grammar({
       $.type_pattern
     ),
 
-    type_pattern: $ => prec(PREC.TYPE_PATTERN, $._type),
+    type_pattern: $ => $._type,
 
     parenthesized_pattern: $ => seq('(', $._pattern, ')'),
 
@@ -915,7 +956,24 @@ module.exports = grammar({
       )),
     ),
 
-    constant_pattern: $ => prec.right($._expression),
+    //We may need to expand this list if more things can be evaluated at compile time
+    constant_pattern: $ => choice(
+      $.binary_expression,
+      $.default_expression,
+      $.interpolated_string_expression,
+      $.parenthesized_expression,
+      $.postfix_unary_expression,
+      $.prefix_unary_expression,
+      $.size_of_expression,
+      $.tuple_expression,
+      $.type_of_expression,
+      $.member_access_expression,
+      $.invocation_expression,
+      $.cast_expression,
+
+      $._simple_name,
+      $._literal
+    ),
 
     declaration_pattern: $ => seq(
       field('type', $._type),
@@ -954,8 +1012,10 @@ module.exports = grammar({
       ')',
     )),
 
+    expression_colon: $ => seq($._expression, ':'),
+
     subpattern: $ => seq(
-      optional($.name_colon),
+      optional($.expression_colon),
       $._pattern
     ),
 
@@ -1195,7 +1255,7 @@ module.exports = grammar({
       field('arguments', $.argument_list)
     )),
 
-    is_pattern_expression: $ => prec.left(PREC.EQUAL, seq(
+    is_pattern_expression: $ => prec.left(PREC.REL, seq(
       field('expression', $._expression),
       'is',
       field('pattern', $._pattern)
@@ -1479,13 +1539,13 @@ module.exports = grammar({
       ))
     ),
 
-    as_expression: $ => prec.left(PREC.EQUAL, seq(
+    as_expression: $ => prec.left(PREC.REL, seq(
       field('left', $._expression),
       field('operator', 'as'),
       field('right', $._type)
     )),
 
-    is_expression: $ => prec.left(PREC.EQUAL, seq(
+    is_expression: $ => prec.left(PREC.REL, seq(
       field('left', $._expression),
       field('operator', 'is'),
       field('right', $._type)

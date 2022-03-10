@@ -1,28 +1,30 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 3953034ee61e8639100b063092d4280e047ca9e9
+Latest commit in repo: 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
 Last change in file:
-  commit aae8ab2b681082ce7a35d8d5fdf75ffcf7f994e5
+  commit c9e1952d311cf87762a42a79cb801c7bef1af815
   Author: Damien Guard <damieng@gmail.com>
-  Date:   Fri Jan 8 13:18:05 2021 +0000
+  Date:   Thu Sep 9 23:38:47 2021 +0100
   
-      Merge branch 'Sjord-linq-query-precedence'
+      Add support for file_scoped_namespace_declaration (#206)
+      
+      * Add support for file_scoped_namespace_declaration
+      
+      * Update source-file-structure.txt
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 3953034ee61e8639100b063092d4280e047ca9e9
+Latest commit in repo: 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
 Last change in file:
-  commit 2482d579c4ebc5bd85b5325994094b6459758a07
-  Author: Sjoerd Langkemper <sjoerd-github@linuxonly.nl>
-  Date:   Fri Jun 18 11:51:44 2021 +0200
+  commit 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
+  Author: Damien Guard <damieng@gmail.com>
+  Date:   Mon Jan 3 12:31:17 2022 +0000
   
-      Don't allow extra's in verbatim interpolated strings
-      
-      Closes #197.
+      Allow 'record class' optional specifier
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 0f12bd86dd178ec6124b5b8f240fb0e44b111e31
+Latest commit in repo: 5096820fbb2a4148134dbfb54e5542c74f03c607
 Last change in file:
   commit 3c80b7e73254c65964690604c064d0e915762532
   Author: pad <pad@r2c.dev>
