@@ -24,15 +24,15 @@ Last change in file:
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 5096820fbb2a4148134dbfb54e5542c74f03c607
+Latest commit in repo: 8b71983c37a4a78d446654245fb4a5853208750f
 Last change in file:
-  commit 3c80b7e73254c65964690604c064d0e915762532
+  commit 8b71983c37a4a78d446654245fb4a5853208750f
   Author: pad <pad@r2c.dev>
-  Date:   Thu Feb 24 10:29:31 2022 +0100
+  Date:   Mon Sep 19 10:32:14 2022 +0200
   
-      [C#] extend grammar to support typed metavariables
+      C#: support $...ARGS
       
-      This will help https://github.com/returntocorp/semgrep/issues/4657
+      This will help https://github.com/returntocorp/semgrep/issues/6065
       
       test plan:
       test file included
