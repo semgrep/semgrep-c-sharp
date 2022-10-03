@@ -1,30 +1,32 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
+Latest commit in repo: 5b60f99545fea00a33bbfae5be956f684c4c69e2
 Last change in file:
-  commit c9e1952d311cf87762a42a79cb801c7bef1af815
+  commit 9c494a503c8e2044bfffce57f70b480c01a82f03
   Author: Damien Guard <damieng@gmail.com>
-  Date:   Thu Sep 9 23:38:47 2021 +0100
+  Date:   Mon May 30 17:23:01 2022 +0100
   
-      Add support for file_scoped_namespace_declaration (#206)
+      Various fixes (#226)
       
-      * Add support for file_scoped_namespace_declaration
+      * Remove label_name not in official grammar"
       
-      * Update source-file-structure.txt
+      * Add some missing fields
+      
+      * Fix lambda modifiers
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
+Latest commit in repo: 5b60f99545fea00a33bbfae5be956f684c4c69e2
 Last change in file:
-  commit 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
+  commit 6685be021003cee953629f7cb50205976d8df1f1
   Author: Damien Guard <damieng@gmail.com>
-  Date:   Mon Jan 3 12:31:17 2022 +0000
+  Date:   Fri Sep 2 09:58:20 2022 +0100
   
-      Allow 'record class' optional specifier
+      Add 'required' keyword for properties + fields.
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 8b71983c37a4a78d446654245fb4a5853208750f
+Latest commit in repo: 491a8d27f1a44c47d0fc98dd138f7b527aa6b2ec
 Last change in file:
   commit 8b71983c37a4a78d446654245fb4a5853208750f
   Author: pad <pad@r2c.dev>

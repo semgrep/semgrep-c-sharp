@@ -74,6 +74,7 @@ module.exports = grammar({
     [$._contextual_keywords, $.type_parameter_constraint],
 
     [$._type, $.array_creation_expression],
+    [$._type, $.attribute],
     [$._type, $.stack_alloc_array_creation_expression],
     [$._type, $._nullable_base_type],
     [$._type, $._nullable_base_type, $.array_creation_expression],
@@ -258,6 +259,7 @@ module.exports = grammar({
       'protected',
       'public',
       'readonly',
+      'required',
       prec(1, 'ref'), //make sure that 'ref' is treated as a modifier for local variable declarations instead of as a ref expression
       'sealed',
       'static',
@@ -343,7 +345,7 @@ module.exports = grammar({
       repeat($.attribute_list),
       'params',
       choice($.array_type, $.nullable_type),
-      $.identifier
+      field('name', $.identifier),
     ),
 
     constructor_initializer: $ => seq(
@@ -381,8 +383,8 @@ module.exports = grammar({
       repeat($.attribute_list),
       optional('extern'),
       '~',
-      $.identifier,
-      $.parameter_list,
+      field('name', $.identifier),
+      field('parameters', $.parameter_list),
       $._function_body
     ),
 
@@ -405,7 +407,7 @@ module.exports = grammar({
     type_parameter: $ => seq(
       repeat($.attribute_list),
       optional(choice('in', 'out')),
-      $.identifier
+      field('name', $.identifier),
     ),
 
     type_parameter_constraints_clause: $ => seq(
@@ -604,6 +606,7 @@ module.exports = grammar({
       field('bases', optional(alias($.record_base, $.base_list))),
       repeat($.type_parameter_constraints_clause),
       field('body', $._record_body),
+      optional(';')
     ),
 
     record_struct_declaration: $ => seq(
@@ -617,6 +620,7 @@ module.exports = grammar({
       field('bases', optional(alias($.record_base, $.base_list))),
       repeat($.type_parameter_constraints_clause),
       field('body', $._record_body),
+      optional(';')
     ),
 
     record_base: $ => choice(
@@ -830,14 +834,10 @@ module.exports = grammar({
       field('body', $._statement)
     ),
 
-    // grammar.txt one doesn't seem to make sense so we do this instead
     goto_statement: $ => seq(
       'goto',
-      choice(
-        alias($.identifier, $.label_name),
-        seq('case', $._expression),
-        'default'
-      ),
+      optional(choice('case', 'default')),
+      optional($._expression),
       ';'
     ),
 
@@ -854,7 +854,7 @@ module.exports = grammar({
     )),
 
     labeled_statement: $ => seq(
-      alias($.identifier, $.label_name),
+      $.identifier,
       ':',
       $._statement
     ),
@@ -926,11 +926,21 @@ module.exports = grammar({
       $.negated_pattern,
       $.parenthesized_pattern,
       $.relational_pattern,
-      $.binary_pattern,
+      $.or_pattern,
+      $.and_pattern,
+      $.list_pattern,
       $.type_pattern
     ),
 
     type_pattern: $ => $._type,
+
+    list_pattern: $ => seq(
+      '[',
+      optional(seq(commaSep1(choice($._pattern, $.slice_pattern)), optional(','))),
+      ']'
+    ),
+
+    slice_pattern: $ => '..',
 
     parenthesized_pattern: $ => seq('(', $._pattern, ')'),
 
@@ -943,18 +953,17 @@ module.exports = grammar({
 
     negated_pattern: $ => seq('not', $._pattern),
 
-    binary_pattern: $ => choice(
-      prec.left(PREC.AND, seq(
-        field('left', $._pattern),
-        field('operator', 'and'),
-        field('right', $._pattern)
-      )),
-      prec.left(PREC.OR, seq(
-        field('left', $._pattern),
-        field('operator', 'or'),
-        field('right', $._pattern)
-      )),
-    ),
+    and_pattern: $ => prec.left(PREC.AND, seq(
+      field('left', $._pattern),
+      field('operator', 'and'),
+      field('right', $._pattern)
+    )),
+
+    or_pattern: $ => prec.left(PREC.OR, seq(
+      field('left', $._pattern),
+      field('operator', 'or'),
+      field('right', $._pattern)
+    )),
 
     //We may need to expand this list if more things can be evaluated at compile time
     constant_pattern: $ => choice(
@@ -983,7 +992,7 @@ module.exports = grammar({
     _variable_designation: $ => prec(1, choice(
       $.discard,
       $.parenthesized_variable_designation,
-      $.identifier
+      field('name', $.identifier),
     )),
 
     discard: $ => '_',
@@ -1053,7 +1062,7 @@ module.exports = grammar({
     catch_declaration: $ => seq(
       '(',
       field('type', $._type),
-      field('name', optional($.identifier)),
+      optional(field('name', $.identifier)),
       ')'
     ),
 
@@ -1086,14 +1095,14 @@ module.exports = grammar({
     anonymous_method_expression: $ => seq(
       optional('async'),
       'delegate',
-      optional($.parameter_list),
+      optional(field('parameters', $.parameter_list)),
       $.block
     ),
 
     lambda_expression: $ => prec(-1, seq(
-      optional('async'),
-      optional('static'),
-      choice($.parameter_list, $.identifier),
+      repeat($.attribute_list),
+      optional(alias(choice('async', 'static', seq('async', 'static'), seq('static', 'async')), $.modifier)),
+      choice(field('parameters', $.parameter_list), $.identifier),
       '=>',
       field('body', choice($.block, $._expression))
     )),
@@ -1636,7 +1645,7 @@ module.exports = grammar({
         $._string_literal_fragment,
         $.escape_sequence
       )),
-      '"'
+      choice('"', '"U8', '"u8')
     ),
 
     _string_literal_fragment: $ => token.immediate(prec(1, /[^"\\\n]+/)),
@@ -1647,7 +1656,7 @@ module.exports = grammar({
         /[^"]/,
         '""',
       )),
-      '"'
+      choice('"', '"U8', '"u8')
     )),
 
     // Comments
