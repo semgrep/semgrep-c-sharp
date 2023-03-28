@@ -20,13 +20,13 @@ type mt = Run.matcher_token
 external create_parser :
   unit -> Tree_sitter_API.ts_parser = "octs_create_parser_c_sharp"
 
-let ts_parser = create_parser ()
+let ts_parser = lazy (create_parser ())
 
 let parse_source_string ?src_file contents =
-  Tree_sitter_parsing.parse_source_string ?src_file ts_parser contents
+  Tree_sitter_parsing.parse_source_string ?src_file (Lazy.force ts_parser) contents
 
 let parse_source_file src_file =
-  Tree_sitter_parsing.parse_source_file ts_parser src_file
+  Tree_sitter_parsing.parse_source_file (Lazy.force ts_parser) src_file
 
 let extras = [
   "comment";

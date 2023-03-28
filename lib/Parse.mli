@@ -24,7 +24,7 @@ val file :
 val debug : bool ref
 
 (** The original tree-sitter parser. *)
-val ts_parser : Tree_sitter_bindings.Tree_sitter_API.ts_parser
+val ts_parser : Tree_sitter_bindings.Tree_sitter_API.ts_parser lazy_t
 
 (** Parse a program into a tree-sitter CST. *)
 val parse_source_string :
