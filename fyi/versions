@@ -1,40 +1,32 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 5b60f99545fea00a33bbfae5be956f684c4c69e2
+Latest commit in repo: 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
 Last change in file:
-  commit 9c494a503c8e2044bfffce57f70b480c01a82f03
+  commit 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
   Author: Damien Guard <damieng@gmail.com>
-  Date:   Mon May 30 17:23:01 2022 +0100
+  Date:   Mon Jan 3 12:31:17 2022 +0000
   
-      Various fixes (#226)
-      
-      * Remove label_name not in official grammar"
-      
-      * Add some missing fields
-      
-      * Fix lambda modifiers
+      Allow 'record class' optional specifier
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 5b60f99545fea00a33bbfae5be956f684c4c69e2
+Latest commit in repo: 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
 Last change in file:
-  commit 6685be021003cee953629f7cb50205976d8df1f1
+  commit 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
   Author: Damien Guard <damieng@gmail.com>
-  Date:   Fri Sep 2 09:58:20 2022 +0100
+  Date:   Mon Jan 3 12:31:17 2022 +0000
   
-      Add 'required' keyword for properties + fields.
+      Allow 'record class' optional specifier
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 491a8d27f1a44c47d0fc98dd138f7b527aa6b2ec
+Latest commit in repo: ee1c82b89fc920d001576d140f8d14323cb8ef81
 Last change in file:
-  commit 8b71983c37a4a78d446654245fb4a5853208750f
+  commit ee1c82b89fc920d001576d140f8d14323cb8ef81
   Author: pad <pad@r2c.dev>
-  Date:   Mon Sep 19 10:32:14 2022 +0200
+  Date:   Tue May 30 13:04:52 2023 +0200
   
-      C#: support $...ARGS
-      
-      This will help https://github.com/returntocorp/semgrep/issues/6065
+      C#: support ellispis in enum declarations
       
       test plan:
       test file included
