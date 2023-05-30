@@ -10,8 +10,6 @@ open Tree_sitter_run
 
 type predefined_type = Token.t
 
-type verbatim_string_literal = Token.t
-
 type interpolated_verbatim_string_text_fragment =
   Token.t (* pattern "[^{\"]+" *)
 
@@ -91,6 +89,7 @@ type modifier = [
   | `Prot of Token.t (* "protected" *)
   | `Public of Token.t (* "public" *)
   | `Read of Token.t (* "readonly" *)
+  | `Requ of Token.t (* "required" *)
   | `Ref of Token.t (* "ref" *)
   | `Sealed of Token.t (* "sealed" *)
   | `Static of Token.t (* "static" *)
@@ -101,7 +100,7 @@ type modifier = [
 
 type preproc_message = Token.t (* pattern [^\n\r]+ *)
 
-type string_literal_fragment = Token.t (* pattern "[^\"\\\\\\n]+" *)
+type verbatim_string_literal = Token.t
 
 type boolean_literal = [
     `True of Token.t (* "true" *)
@@ -159,6 +158,8 @@ type nullable_directive = (
     ]
       option
 )
+
+type string_literal_fragment = Token.t (* pattern "[^\"\\\\\\n]+" *)
 
 type semgrep_metavariable = Token.t
 
@@ -336,7 +337,11 @@ type literal = [
           | `Esc_seq of escape_sequence (*tok*)
         ]
           list (* zero or more *)
-      * Token.t (* "\"" *)
+      * [
+            `DQUOT of Token.t (* "\"" *)
+          | `DQUOTU8 of Token.t (* "\"U8" *)
+          | `DQUOTu8 of Token.t (* "\"u8" *)
+        ]
     )
   | `Verb_str_lit of verbatim_string_literal (*tok*)
 ]
@@ -407,6 +412,11 @@ and anon_choice_param_ce11a32 = [
       * [ `Array_type of array_type | `Null_type of nullable_type ]
       * identifier
     )
+]
+
+and anon_choice_pat_29be9ad = [
+    `Pat of pattern
+  | `Slice_pat of Token.t (* ".." *)
 ]
 
 and anon_opt_exp_rep_interp_alig_clause_cd88eaa =
@@ -499,11 +509,6 @@ and binary_expression = [
   | `Exp_GTEQ_exp of (expression * Token.t (* ">=" *) * expression)
   | `Exp_GT_exp of (expression * Token.t (* ">" *) * expression)
   | `Exp_QMARKQMARK_exp of (expression * Token.t (* "??" *) * expression)
-]
-
-and binary_pattern = [
-    `Pat_and_pat of (pattern * Token.t (* "and" *) * pattern)
-  | `Pat_or_pat of (pattern * Token.t (* "or" *) * pattern)
 ]
 
 and block = (
@@ -659,8 +664,14 @@ and expression = [
   | `Is_exp of (expression * Token.t (* "is" *) * type_pattern)
   | `Is_pat_exp of (expression * Token.t (* "is" *) * pattern)
   | `Lambda_exp of (
-        Token.t (* "async" *) option
-      * Token.t (* "static" *) option
+        attribute_list list (* zero or more *)
+      * [
+            `Async of Token.t (* "async" *)
+          | `Static of Token.t (* "static" *)
+          | `Async_static of (Token.t (* "async" *) * Token.t (* "static" *))
+          | `Static_async of (Token.t (* "static" *) * Token.t (* "async" *))
+        ]
+          option
       * [ `Param_list of parameter_list | `Id of identifier ]
       * Token.t (* "=>" *)
       * [ `Blk of block | `Exp of expression ]
@@ -913,7 +924,19 @@ and pattern = [
   | `Nega_pat of (Token.t (* "not" *) * pattern)
   | `Paren_pat of (Token.t (* "(" *) * pattern * Token.t (* ")" *))
   | `Rela_pat of relational_pattern
-  | `Bin_pat of binary_pattern
+  | `Or_pat of (pattern * Token.t (* "or" *) * pattern)
+  | `And_pat of (pattern * Token.t (* "and" *) * pattern)
+  | `List_pat of (
+        Token.t (* "[" *)
+      * (
+            anon_choice_pat_29be9ad
+          * (Token.t (* "," *) * anon_choice_pat_29be9ad)
+              list (* zero or more *)
+          * Token.t (* "," *) option
+        )
+          option
+      * Token.t (* "]" *)
+    )
   | `Type_pat of type_pattern
 ]
 
@@ -1082,11 +1105,9 @@ and statement = [
     )
   | `Goto_stmt of (
         Token.t (* "goto" *)
-      * [
-            `Id of identifier
-          | `Case_exp of (Token.t (* "case" *) * expression)
-          | `Defa of Token.t (* "default" *)
-        ]
+      * [ `Case of Token.t (* "case" *) | `Defa of Token.t (* "default" *) ]
+          option
+      * expression option
       * Token.t (* ";" *)
     )
   | `If_stmt of (
@@ -1577,6 +1598,7 @@ and record_declaration = (
   * record_base option
   * type_parameter_constraints_clause list (* zero or more *)
   * record_body
+  * Token.t (* ";" *) option
 )
 
 and record_struct_declaration = (
@@ -1590,6 +1612,7 @@ and record_struct_declaration = (
   * record_base option
   * type_parameter_constraints_clause list (* zero or more *)
   * record_body
+  * Token.t (* ";" *) option
 )
 
 and struct_declaration = (
@@ -1652,13 +1675,15 @@ type global (* inlined *) = Token.t (* "global" *)
 
 type ellipsis (* inlined *) = Token.t (* "..." *)
 
+type void_keyword (* inlined *) = Token.t (* "void" *)
+
 type implicit_type (* inlined *) = Token.t (* "var" *)
 
 type else_directive (* inlined *) = Token.t (* "else" *)
 
 type comment (* inlined *) = Token.t
 
-type void_keyword (* inlined *) = Token.t (* "void" *)
+type this_expression (* inlined *) = Token.t (* "this" *)
 
 type base_expression (* inlined *) = Token.t (* "base" *)
 
@@ -1674,9 +1699,9 @@ type continue_statement (* inlined *) = (
 
 type discard (* inlined *) = Token.t (* "_" *)
 
-type null_literal (* inlined *) = Token.t (* "null" *)
+type slice_pattern (* inlined *) = Token.t (* ".." *)
 
-type this_expression (* inlined *) = Token.t (* "this" *)
+type null_literal (* inlined *) = Token.t (* "null" *)
 
 type endif_directive (* inlined *) = Token.t (* "endif" *)
 
@@ -1696,7 +1721,11 @@ type string_literal (* inlined *) = (
       | `Esc_seq of escape_sequence (*tok*)
     ]
       list (* zero or more *)
-  * Token.t (* "\"" *)
+  * [
+        `DQUOT of Token.t (* "\"" *)
+      | `DQUOTU8 of Token.t (* "\"U8" *)
+      | `DQUOTu8 of Token.t (* "\"u8" *)
+    ]
 )
 
 type preproc_parenthesized_expression (* inlined *) = (
@@ -1742,6 +1771,8 @@ type preprocessor_call (* inlined *) = (
 type alias_qualified_name (* inlined *) = (
     identifier_or_global * Token.t (* "::" *) * simple_name
 )
+
+type and_pattern (* inlined *) = (pattern * Token.t (* "and" *) * pattern)
 
 type anonymous_method_expression (* inlined *) = (
     Token.t (* "async" *) option
@@ -1857,11 +1888,9 @@ type generic_name (* inlined *) = (identifier * type_argument_list)
 
 type goto_statement (* inlined *) = (
     Token.t (* "goto" *)
-  * [
-        `Id of identifier
-      | `Case_exp of (Token.t (* "case" *) * expression)
-      | `Defa of Token.t (* "default" *)
-    ]
+  * [ `Case of Token.t (* "case" *) | `Defa of Token.t (* "default" *) ]
+      option
+  * expression option
   * Token.t (* ";" *)
 )
 
@@ -1923,8 +1952,14 @@ type labeled_statement (* inlined *) = (
 )
 
 type lambda_expression (* inlined *) = (
-    Token.t (* "async" *) option
-  * Token.t (* "static" *) option
+    attribute_list list (* zero or more *)
+  * [
+        `Async of Token.t (* "async" *)
+      | `Static of Token.t (* "static" *)
+      | `Async_static of (Token.t (* "async" *) * Token.t (* "static" *))
+      | `Static_async of (Token.t (* "static" *) * Token.t (* "async" *))
+    ]
+      option
   * [ `Param_list of parameter_list | `Id of identifier ]
   * Token.t (* "=>" *)
   * [ `Blk of block | `Exp of expression ]
@@ -1932,6 +1967,17 @@ type lambda_expression (* inlined *) = (
 
 type let_clause (* inlined *) = (
     Token.t (* "let" *) * identifier * Token.t (* "=" *) * expression
+)
+
+type list_pattern (* inlined *) = (
+    Token.t (* "[" *)
+  * (
+        anon_choice_pat_29be9ad
+      * (Token.t (* "," *) * anon_choice_pat_29be9ad) list (* zero or more *)
+      * Token.t (* "," *) option
+    )
+      option
+  * Token.t (* "]" *)
 )
 
 type local_declaration_statement (* inlined *) = (
@@ -1975,6 +2021,8 @@ type object_creation_expression (* inlined *) = (
   * argument_list option
   * initializer_expression option
 )
+
+type or_pattern (* inlined *) = (pattern * Token.t (* "or" *) * pattern)
 
 type order_by_clause (* inlined *) = (
     Token.t (* "orderby" *)

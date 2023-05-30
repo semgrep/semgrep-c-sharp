@@ -1,26 +1,28 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
+Latest commit in repo: 6685be021003cee953629f7cb50205976d8df1f1
 Last change in file:
-  commit 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
-  Author: Damien Guard <damieng@gmail.com>
-  Date:   Mon Jan 3 12:31:17 2022 +0000
+  commit 2a890da4b93c34fefc28be97e6fdc4b8aaacf735
+  Author: Max Brunsfeld <maxbrunsfeld@gmail.com>
+  Date:   Tue Nov 15 12:28:45 2016 -0800
   
-      Allow 'record class' optional specifier
+      Add LICENSE, README, travis config file
+      
+      Signed-off-by: Damien Guard <damieng@github.com>
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
+Latest commit in repo: 6685be021003cee953629f7cb50205976d8df1f1
 Last change in file:
-  commit 352a4630c81a7a5cbd3bc67327743bd8d38f2dd2
+  commit 6685be021003cee953629f7cb50205976d8df1f1
   Author: Damien Guard <damieng@gmail.com>
-  Date:   Mon Jan 3 12:31:17 2022 +0000
+  Date:   Fri Sep 2 09:58:20 2022 +0100
   
-      Allow 'record class' optional specifier
+      Add 'required' keyword for properties + fields.
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: ee1c82b89fc920d001576d140f8d14323cb8ef81
+Latest commit in repo: 4a98f4ae9d8072f2799386c977742cb75a3b779b
 Last change in file:
   commit ee1c82b89fc920d001576d140f8d14323cb8ef81
   Author: pad <pad@r2c.dev>
