@@ -1,28 +1,26 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 6685be021003cee953629f7cb50205976d8df1f1
+Latest commit in repo: aaafc3d75f058ca5fe639b7ed5829964a3ca4575
 Last change in file:
-  commit 2a890da4b93c34fefc28be97e6fdc4b8aaacf735
-  Author: Max Brunsfeld <maxbrunsfeld@gmail.com>
-  Date:   Tue Nov 15 12:28:45 2016 -0800
+  commit 2162260aec4c7d7d4b43ef2287388adcc302c8d6
+  Author: Damien Guard <damieng@gmail.com>
+  Date:   Wed Jan 11 23:17:42 2023 +0000
   
-      Add LICENSE, README, travis config file
-      
-      Signed-off-by: Damien Guard <damieng@github.com>
+      Update copyright notice
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: 6685be021003cee953629f7cb50205976d8df1f1
+Latest commit in repo: aaafc3d75f058ca5fe639b7ed5829964a3ca4575
 Last change in file:
-  commit 6685be021003cee953629f7cb50205976d8df1f1
-  Author: Damien Guard <damieng@gmail.com>
-  Date:   Fri Sep 2 09:58:20 2022 +0100
+  commit 997e9f4972960a95c1669e6b5d7b97c4fe3aeb50
+  Author: Tamas Vajk <tamasvajk@github.com>
+  Date:   Wed May 10 11:19:30 2023 +0200
   
-      Add 'required' keyword for properties + fields.
+      Fix unhandled parameter modifier combination
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 4a98f4ae9d8072f2799386c977742cb75a3b779b
+Latest commit in repo: 49516d0043dc982352523c434dabb3372b4e30b8
 Last change in file:
   commit ee1c82b89fc920d001576d140f8d14323cb8ef81
   Author: pad <pad@r2c.dev>
