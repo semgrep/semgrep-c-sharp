@@ -8,24 +8,6 @@
 open! Sexplib.Conv
 open Tree_sitter_run
 
-type anon_choice_async_25087f5 = [
-    `Async of Token.t (* "async" *)
-  | `Static of Token.t (* "static" *)
-  | `Async_static of (Token.t (* "async" *) * Token.t (* "static" *))
-  | `Static_async of (Token.t (* "static" *) * Token.t (* "async" *))
-]
-
-type semgrep_variadic_metavariable =
-  Token.t (* pattern \$\.\.\.[A-Z_][A-Z_0-9]* *)
-
-type string_literal_encoding = Token.t (* pattern (u|U)8 *)
-
-type pat_00238b3 = Token.t (* pattern [^\n\r]* *)
-
-type preproc_integer_literal = Token.t (* pattern [0-9]+ *)
-
-type identifier_token = Token.t
-
 type overloadable_operator = [
     `BANG of Token.t (* "!" *)
   | `TILDE of Token.t (* "~" *)
@@ -52,7 +34,25 @@ type overloadable_operator = [
   | `LTEQ of Token.t (* "<=" *)
 ]
 
+type string_literal_fragment = Token.t (* pattern "[^\"\\\\\\n]+" *)
+
+type anon_choice_async_25087f5 = [
+    `Async of Token.t (* "async" *)
+  | `Static of Token.t (* "static" *)
+  | `Async_static of (Token.t (* "async" *) * Token.t (* "static" *))
+  | `Static_async of (Token.t (* "static" *) * Token.t (* "async" *))
+]
+
+type semgrep_variadic_metavariable =
+  Token.t (* pattern \$\.\.\.[A-Z_][A-Z_0-9]* *)
+
 type semgrep_metavariable = Token.t
+
+type preproc_directive_start = Token.t (* pattern #[ \t]* *)
+
+type identifier_token = Token.t
+
+type opt_semi = Token.t
 
 type anon_choice_ref_eec35e8 = [
     `Ref of Token.t (* "ref" *)
@@ -60,7 +60,7 @@ type anon_choice_ref_eec35e8 = [
   | `In of Token.t (* "in" *)
 ]
 
-type real_literal = Token.t
+type raw_string_literal = Token.t
 
 type nullable_directive = (
     Token.t (* "nullable" *)
@@ -106,8 +106,6 @@ type contextual_keywords = [
   | `Yield of Token.t (* "yield" *)
 ]
 
-type predefined_type = Token.t
-
 type assignment_operator = [
     `EQ of Token.t (* "=" *)
   | `PLUSEQ of Token.t (* "+=" *)
@@ -132,24 +130,24 @@ type boolean_literal = [
 type interpolated_string_text_fragment =
   Token.t (* pattern "[^{\"\\\\\\n]+" *)
 
-type string_literal_fragment = Token.t (* pattern "[^\"\\\\\\n]+" *)
+type string_literal_encoding = Token.t (* pattern (u|U)8 *)
 
 type character_literal_unescaped = Token.t (* pattern "[^'\\\\]" *)
 
-type preproc_message = Token.t (* pattern [^\n\r]+ *)
+type preproc_integer_literal = Token.t (* pattern [0-9]+ *)
 
 type integer_literal = Token.t
 
 type default_switch_label = (Token.t (* "default" *) * Token.t (* ":" *))
 
-type preproc_directive_end = Token.t
-
-type verbatim_string_literal = Token.t
+type pat_52ffbd7 = Token.t (* pattern "[^}\"]+" *)
 
 type interpolated_verbatim_string_text_fragment =
   Token.t (* pattern "[^{\"]+" *)
 
-type preproc_string_literal = Token.t (* pattern "\"[^\"]*\"" *)
+type preproc_message = Token.t (* pattern [^\n\r]+ *)
+
+type real_literal = Token.t
 
 type modifier = [
     `Abst of Token.t (* "abstract" *)
@@ -174,7 +172,9 @@ type modifier = [
   | `Vola of Token.t (* "volatile" *)
 ]
 
-type raw_string_literal = Token.t
+type verbatim_string_literal = Token.t
+
+type preproc_string_literal = Token.t (* pattern "\"[^\"]*\"" *)
 
 type attribute_target_specifier = (
     [
@@ -191,11 +191,11 @@ type attribute_target_specifier = (
 
 type escape_sequence = Token.t
 
-type pat_52ffbd7 = Token.t (* pattern "[^}\"]+" *)
+type pat_00238b3 = Token.t (* pattern [^\n\r]* *)
 
-type preproc_directive_start = Token.t (* pattern #[ \t]* *)
+type preproc_directive_end = Token.t
 
-type shebang_directive = (Token.t (* "!" *) * pat_00238b3)
+type predefined_type = Token.t
 
 type identifier = [
     `Choice_id_tok of [
@@ -205,19 +205,7 @@ type identifier = [
   | `Semg_meta of semgrep_metavariable (*tok*)
 ]
 
-type region_directive = (
-    Token.t (* "region" *)
-  * preproc_message (*tok*) option
-)
-
-type warning_directive = (Token.t (* "warning" *) * preproc_message (*tok*))
-
-type endregion_directive = (
-    Token.t (* "endregion" *)
-  * preproc_message (*tok*) option
-)
-
-type error_directive = (Token.t (* "error" *) * preproc_message (*tok*))
+type interpolation_format_clause = (Token.t (* ":" *) * pat_52ffbd7)
 
 type interpolated_raw_string_text = [
     `Inte_verb_str_text_frag of
@@ -232,6 +220,20 @@ type interpolated_verbatim_string_text = [
       interpolated_verbatim_string_text_fragment (*tok*)
   | `DQUOTDQUOT of Token.t (* "\"\"" *)
 ]
+
+type region_directive = (
+    Token.t (* "region" *)
+  * preproc_message (*tok*) option
+)
+
+type endregion_directive = (
+    Token.t (* "endregion" *)
+  * preproc_message (*tok*) option
+)
+
+type error_directive = (Token.t (* "error" *) * preproc_message (*tok*))
+
+type warning_directive = (Token.t (* "warning" *) * preproc_message (*tok*))
 
 type load_directive = (Token.t (* "load" *) * preproc_string_literal (*tok*))
 
@@ -272,7 +274,7 @@ type interpolated_string_text = [
   | `Esc_seq of escape_sequence (*tok*)
 ]
 
-type interpolation_format_clause = (Token.t (* ":" *) * pat_52ffbd7)
+type shebang_directive = (Token.t (* "!" *) * pat_00238b3)
 
 type function_pointer_unmanaged_calling_convention = [
     `Cdecl of Token.t (* "Cdecl" *)
@@ -281,6 +283,8 @@ type function_pointer_unmanaged_calling_convention = [
   | `Fast of Token.t (* "Fastcall" *)
   | `Id of identifier
 ]
+
+type undef_directive = (Token.t (* "undef" *) * identifier)
 
 type variable_designation = [
     `Disc of Token.t (* "_" *)
@@ -304,8 +308,6 @@ type identifier_or_global = [
   | `Id of identifier
 ]
 
-type undef_directive = (Token.t (* "undef" *) * identifier)
-
 type anon_choice_id_c036834 = [
     `Id of identifier
   | `Disc of Token.t (* "_" *)
@@ -318,18 +320,6 @@ and tuple_pattern = (
   * (Token.t (* "," *) * anon_choice_id_c036834) list (* zero or more *)
   * Token.t (* ")" *)
 )
-
-type define_directive = (Token.t (* "define" *) * identifier)
-
-type extern_alias_directive = (
-    Token.t (* "extern" *) * Token.t (* "alias" *) * identifier
-  * Token.t (* ";" *)
-)
-
-type anon_choice_id_c290f8e = [
-    `Id of identifier
-  | `Prep_int_lit of preproc_integer_literal (*tok*)
-]
 
 type preproc_binary_expression = [
     `Prep_exp_BARBAR_prep_exp of (
@@ -356,6 +346,18 @@ and preproc_expression = [
   | `Prep_paren_exp of (
         Token.t (* "(" *) * preproc_expression * Token.t (* ")" *)
     )
+]
+
+type define_directive = (Token.t (* "define" *) * identifier)
+
+type extern_alias_directive = (
+    Token.t (* "extern" *) * Token.t (* "alias" *) * identifier
+  * Token.t (* ";" *)
+)
+
+type anon_choice_id_c290f8e = [
+    `Id of identifier
+  | `Prep_int_lit of preproc_integer_literal (*tok*)
 ]
 
 type literal = [
@@ -402,6 +404,10 @@ type anon_choice_id_bf14316 = [
   | `Tuple_pat of tuple_pattern
 ]
 
+type if_directive = (Token.t (* "if" *) * preproc_expression)
+
+type elif_directive = (Token.t (* "elif" *) * preproc_expression)
+
 type pragma_directive = (
     Token.t (* "pragma" *)
   * [
@@ -424,10 +430,6 @@ type pragma_directive = (
         )
     ]
 )
-
-type if_directive = (Token.t (* "if" *) * preproc_expression)
-
-type elif_directive = (Token.t (* "elif" *) * preproc_expression)
 
 type function_pointer_calling_convention = [
     `Mana of Token.t (* "managed" *)
@@ -632,6 +634,10 @@ and constant_pattern = [
 
 and declaration_expression = (type_pattern * identifier)
 
+and deep_ellipsis = (
+    Token.t (* "<..." *) * expression * Token.t (* "...>" *)
+)
+
 and default_expression = (
     Token.t (* "default" *)
   * (Token.t (* "(" *) * type_pattern * Token.t (* ")" *)) option
@@ -645,17 +651,9 @@ and expression = [
     `Non_lvalue_exp of non_lvalue_expression
   | `Lvalue_exp of lvalue_expression
   | `Ellips of Token.t (* "..." *)
-  | `Deep_ellips of (
-        Token.t (* "<..." *) * expression * Token.t (* "...>" *)
-    )
-  | `Member_access_ellips_exp of (
-        anon_choice_exp_3bb8381 * anon_choice_DOT_2ad1dab
-      * Token.t (* "..." *)
-    )
-  | `Typed_meta of (
-        Token.t (* "(" *) * type_pattern * semgrep_metavariable (*tok*)
-      * Token.t (* ")" *)
-    )
+  | `Deep_ellips of deep_ellipsis
+  | `Member_access_ellips_exp of member_access_ellipsis_expression
+  | `Typed_meta of typed_metavariable
 ]
 
 and expression_colon = (expression * Token.t (* ":" *))
@@ -666,6 +664,12 @@ and expression_statement = [
     )
   | `Ellips_SEMI of (Token.t (* "..." *) * Token.t (* ";" *))
   | `Ellips of Token.t (* "..." *)
+  | `Deep_ellips_SEMI of (deep_ellipsis * Token.t (* ";" *))
+  | `Member_access_ellips_exp_SEMI of (
+        member_access_ellipsis_expression * Token.t (* ";" *)
+    )
+  | `Semg_meta_SEMI of (semgrep_metavariable (*tok*) * Token.t (* ";" *))
+  | `Typed_meta_SEMI of (typed_metavariable * Token.t (* ";" *))
 ]
 
 and expression_statement_expression = [
@@ -792,6 +796,10 @@ and lvalue_expression = [
         Token.t (* "(" *) * lvalue_expression * Token.t (* ")" *)
     )
 ]
+
+and member_access_ellipsis_expression = (
+    anon_choice_exp_3bb8381 * anon_choice_DOT_2ad1dab * Token.t (* "..." *)
+)
 
 and member_access_expression = (
     anon_choice_exp_3bb8381 * anon_choice_DOT_2ad1dab * simple_name
@@ -1398,6 +1406,11 @@ and type_parameter_list = (
 
 and type_pattern = type_
 
+and typed_metavariable = (
+    Token.t (* "(" *) * type_pattern * semgrep_metavariable (*tok*)
+  * Token.t (* ")" *)
+)
+
 and variable_declaration = (
     type_pattern
   * variable_declarator
@@ -1422,15 +1435,6 @@ type bracketed_parameter_list = (
     Token.t (* "[" *) * formal_parameter_list * Token.t (* "]" *)
 )
 
-type using_directive = (
-    Token.t (* "global" *) option
-  * Token.t (* "using" *)
-  * [ `Static of Token.t (* "static" *) | `Name_equals of name_equals ]
-      option
-  * type_name
-  * Token.t (* ";" *)
-)
-
 type base_list = (
     Token.t (* ":" *)
   * type_pattern
@@ -1445,6 +1449,17 @@ type constructor_initializer = (
   * argument_list
 )
 
+type primary_constructor_base_type = (type_name * argument_list)
+
+type using_directive = (
+    Token.t (* "global" *) option
+  * Token.t (* "using" *)
+  * [ `Static of Token.t (* "static" *) | `Name_equals of name_equals ]
+      option
+  * type_name
+  * Token.t (* ";" *)
+)
+
 type global_attribute_list = (
     Token.t (* "[" *)
   * [ `Asse of Token.t (* "assembly" *) | `Module of Token.t (* "module" *) ]
@@ -1453,8 +1468,6 @@ type global_attribute_list = (
       option
   * Token.t (* "]" *)
 )
-
-type primary_constructor_base_type = (type_name * argument_list)
 
 type accessor_declaration = (
     attribute_list list (* zero or more *)
@@ -1533,7 +1546,7 @@ type enum_declaration = (
   * identifier
   * base_list option
   * enum_member_declaration_list
-  * Token.t (* ";" *) option
+  * opt_semi (*tok*)
 )
 
 type class_declaration = (
@@ -1545,7 +1558,7 @@ type class_declaration = (
   * base_list option
   * type_parameter_constraints_clause list (* zero or more *)
   * declaration_list
-  * Token.t (* ";" *) option
+  * opt_semi (*tok*)
 )
 
 and declaration = [
@@ -1680,14 +1693,12 @@ and interface_declaration = (
   * base_list option
   * type_parameter_constraints_clause list (* zero or more *)
   * declaration_list
-  * Token.t (* ";" *) option
+  * opt_semi (*tok*)
 )
 
 and namespace_declaration = (
-    Token.t (* "namespace" *)
-  * type_name
-  * declaration_list
-  * Token.t (* ";" *) option
+    Token.t (* "namespace" *) * type_name * declaration_list
+  * opt_semi (*tok*)
 )
 
 and record_body = [
@@ -1706,7 +1717,7 @@ and record_declaration = (
   * record_base option
   * type_parameter_constraints_clause list (* zero or more *)
   * record_body
-  * Token.t (* ";" *) option
+  * opt_semi (*tok*)
 )
 
 and record_struct_declaration = (
@@ -1720,7 +1731,7 @@ and record_struct_declaration = (
   * record_base option
   * type_parameter_constraints_clause list (* zero or more *)
   * record_body
-  * Token.t (* ";" *) option
+  * opt_semi (*tok*)
 )
 
 and struct_declaration = (
@@ -1733,7 +1744,7 @@ and struct_declaration = (
   * base_list option
   * type_parameter_constraints_clause list (* zero or more *)
   * declaration_list
-  * Token.t (* ";" *) option
+  * opt_semi (*tok*)
 )
 
 type type_declaration = [
@@ -1776,18 +1787,6 @@ type compilation_unit = [
   | `Semg_exp of (Token.t (* "__SEMGREP_EXPRESSION" *) * expression)
 ]
 
-type parameter_modifier (* inlined *) = [
-    `Ref of Token.t (* "ref" *)
-  | `Out of Token.t (* "out" *)
-  | `This of Token.t (* "this" *)
-  | `In of Token.t (* "in" *)
-  | `Scoped of Token.t (* "scoped" *)
-]
-
-type this_expression (* inlined *) = Token.t (* "this" *)
-
-type slice_pattern (* inlined *) = Token.t (* ".." *)
-
 type continue_statement (* inlined *) = (
     Token.t (* "continue" *) * Token.t (* ";" *)
 )
@@ -1800,13 +1799,25 @@ type break_statement (* inlined *) = (
 
 type discard (* inlined *) = Token.t (* "_" *)
 
+type parameter_modifier (* inlined *) = [
+    `Ref of Token.t (* "ref" *)
+  | `Out of Token.t (* "out" *)
+  | `This of Token.t (* "this" *)
+  | `In of Token.t (* "in" *)
+  | `Scoped of Token.t (* "scoped" *)
+]
+
 type constructor_constraint (* inlined *) = (
     Token.t (* "new" *) * Token.t (* "(" *) * Token.t (* ")" *)
 )
 
+type this_expression (* inlined *) = Token.t (* "this" *)
+
 type endif_directive (* inlined *) = Token.t (* "endif" *)
 
 type null_literal (* inlined *) = Token.t (* "null" *)
+
+type slice_pattern (* inlined *) = Token.t (* ".." *)
 
 type base_expression (* inlined *) = Token.t (* "base" *)
 
@@ -1820,15 +1831,6 @@ type ellipsis (* inlined *) = Token.t (* "..." *)
 
 type empty_statement (* inlined *) = Token.t (* ";" *)
 
-type character_literal (* inlined *) = (
-    Token.t (* "'" *)
-  * [
-        `Char_lit_unes of character_literal_unescaped (*tok*)
-      | `Esc_seq of escape_sequence (*tok*)
-    ]
-  * Token.t (* "'" *)
-)
-
 type string_literal (* inlined *) = (
     Token.t (* "\"" *)
   * [
@@ -1838,6 +1840,15 @@ type string_literal (* inlined *) = (
       list (* zero or more *)
   * Token.t (* "\"" *)
   * string_literal_encoding (*tok*) option
+)
+
+type character_literal (* inlined *) = (
+    Token.t (* "'" *)
+  * [
+        `Char_lit_unes of character_literal_unescaped (*tok*)
+      | `Esc_seq of escape_sequence (*tok*)
+    ]
+  * Token.t (* "'" *)
 )
 
 type parenthesized_variable_designation (* inlined *) = (
@@ -1946,10 +1957,6 @@ type conditional_expression (* inlined *) = (
 
 type declaration_pattern (* inlined *) = (
     type_pattern * variable_designation
-)
-
-type deep_ellipsis (* inlined *) = (
-    Token.t (* "<..." *) * expression * Token.t (* "...>" *)
 )
 
 type do_statement (* inlined *) = (
@@ -2119,10 +2126,6 @@ type make_ref_expression (* inlined *) = (
   * Token.t (* ")" *)
 )
 
-type member_access_ellipsis_expression (* inlined *) = (
-    anon_choice_exp_3bb8381 * anon_choice_DOT_2ad1dab * Token.t (* "..." *)
-)
-
 type negated_pattern (* inlined *) = (Token.t (* "not" *) * pattern)
 
 type object_creation_expression (* inlined *) = (
@@ -2248,11 +2251,6 @@ type try_statement (* inlined *) = (
   * finally_clause option
 )
 
-type typed_metavariable (* inlined *) = (
-    Token.t (* "(" *) * type_pattern * semgrep_metavariable (*tok*)
-  * Token.t (* ")" *)
-)
-
 type unsafe_statement (* inlined *) = (Token.t (* "unsafe" *) * block)
 
 type using_statement (* inlined *) = (
@@ -2361,6 +2359,21 @@ type constructor_declaration (* inlined *) = (
   * function_body
 )
 
+type indexer_declaration (* inlined *) = (
+    attribute_list list (* zero or more *)
+  * modifier list (* zero or more *)
+  * type_pattern
+  * explicit_interface_specifier option
+  * Token.t (* "this" *)
+  * bracketed_parameter_list
+  * [
+        `Acce_list of accessor_list
+      | `Arrow_exp_clause_SEMI of (
+            arrow_expression_clause * Token.t (* ";" *)
+        )
+    ]
+)
+
 type property_declaration (* inlined *) = (
     attribute_list list (* zero or more *)
   * modifier list (* zero or more *)
@@ -2372,21 +2385,6 @@ type property_declaration (* inlined *) = (
             accessor_list
           * (Token.t (* "=" *) * expression * Token.t (* ";" *)) option
         )
-      | `Arrow_exp_clause_SEMI of (
-            arrow_expression_clause * Token.t (* ";" *)
-        )
-    ]
-)
-
-type indexer_declaration (* inlined *) = (
-    attribute_list list (* zero or more *)
-  * modifier list (* zero or more *)
-  * type_pattern
-  * explicit_interface_specifier option
-  * Token.t (* "this" *)
-  * bracketed_parameter_list
-  * [
-        `Acce_list of accessor_list
       | `Arrow_exp_clause_SEMI of (
             arrow_expression_clause * Token.t (* ";" *)
         )

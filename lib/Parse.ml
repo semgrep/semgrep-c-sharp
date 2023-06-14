@@ -61,7 +61,7 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal "yield");
     |];
   );
-  "predefined_type", None;
+  "this_expression", None;
   "discard", None;
   "attribute_target_specifier",
   Some (
@@ -78,8 +78,8 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal ":");
     ];
   );
-  "this_expression", None;
   "string_literal_fragment", None;
+  "string_literal_encoding", None;
   "constructor_constraint",
   Some (
     Seq [
@@ -88,9 +88,8 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal ")");
     ];
   );
-  "string_literal_encoding", None;
-  "semgrep_metavariable", None;
   "pat_52ffbd7", None;
+  "predefined_type", None;
   "assignment_operator",
   Some (
     Alt [|
@@ -116,8 +115,9 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal ":");
     ];
   );
-  "verbatim_string_literal", None;
   "escape_sequence", None;
+  "slice_pattern", None;
+  "semgrep_variadic_metavariable", None;
   "character_literal_unescaped", None;
   "break_statement",
   Some (
@@ -134,7 +134,6 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal ";");
     ];
   );
-  "raw_string_literal", None;
   "modifier",
   Some (
     Alt [|
@@ -161,9 +160,11 @@ let children_regexps : (string * Run.exp option) list = [
     |];
   );
   "integer_literal", None;
+  "verbatim_string_literal", None;
   "interpolated_verbatim_string_text_fragment", None;
   "ellipsis", None;
   "interpolated_string_text_fragment", None;
+  "opt_semi", None;
   "overloadable_operator",
   Some (
     Alt [|
@@ -195,9 +196,9 @@ let children_regexps : (string * Run.exp option) list = [
   "null_literal", None;
   "implicit_type", None;
   "base_expression", None;
+  "raw_string_literal", None;
+  "semgrep_metavariable", None;
   "real_literal", None;
-  "semgrep_variadic_metavariable", None;
-  "slice_pattern", None;
   "global", None;
   "boolean_literal",
   Some (
@@ -241,16 +242,6 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal "'");
     ];
   );
-  "identifier",
-  Some (
-    Alt [|
-      Alt [|
-        Token (Name "identifier_token");
-        Token (Name "contextual_keywords");
-      |];
-      Token (Name "semgrep_metavariable");
-    |];
-  );
   "interpolated_raw_string_text",
   Some (
     Alt [|
@@ -275,6 +266,16 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Name "escape_sequence");
     |];
   );
+  "identifier",
+  Some (
+    Alt [|
+      Alt [|
+        Token (Name "identifier_token");
+        Token (Name "contextual_keywords");
+      |];
+      Token (Name "semgrep_metavariable");
+    |];
+  );
   "literal",
   Some (
     Alt [|
@@ -287,28 +288,6 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Name "verbatim_string_literal");
       Token (Name "raw_string_literal");
     |];
-  );
-  "tuple_pattern",
-  Some (
-    Seq [
-      Token (Literal "(");
-      Alt [|
-        Token (Name "identifier");
-        Token (Name "discard");
-        Token (Name "tuple_pattern");
-      |];
-      Repeat (
-        Seq [
-          Token (Literal ",");
-          Alt [|
-            Token (Name "identifier");
-            Token (Name "discard");
-            Token (Name "tuple_pattern");
-          |];
-        ];
-      );
-      Token (Literal ")");
-    ];
   );
   "join_into_clause",
   Some (
@@ -361,6 +340,28 @@ let children_regexps : (string * Run.exp option) list = [
         Token (Name "identifier");
       |];
       Token (Literal ":");
+    ];
+  );
+  "tuple_pattern",
+  Some (
+    Seq [
+      Token (Literal "(");
+      Alt [|
+        Token (Name "identifier");
+        Token (Name "discard");
+        Token (Name "tuple_pattern");
+      |];
+      Repeat (
+        Seq [
+          Token (Literal ",");
+          Alt [|
+            Token (Name "identifier");
+            Token (Name "discard");
+            Token (Name "tuple_pattern");
+          |];
+        ];
+      );
+      Token (Literal ")");
     ];
   );
   "extern_alias_directive",
@@ -1022,6 +1023,22 @@ let children_regexps : (string * Run.exp option) list = [
         Token (Literal ";");
       ];
       Token (Name "ellipsis");
+      Seq [
+        Token (Name "deep_ellipsis");
+        Token (Literal ";");
+      ];
+      Seq [
+        Token (Name "member_access_ellipsis_expression");
+        Token (Literal ";");
+      ];
+      Seq [
+        Token (Name "semgrep_metavariable");
+        Token (Literal ";");
+      ];
+      Seq [
+        Token (Name "typed_metavariable");
+        Token (Literal ";");
+      ];
     |];
   );
   "expression_statement_expression",
@@ -2579,12 +2596,43 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal ";");
     ];
   );
+  "using_directive",
+  Some (
+    Seq [
+      Opt (
+        Token (Literal "global");
+      );
+      Token (Literal "using");
+      Opt (
+        Alt [|
+          Token (Literal "static");
+          Token (Name "name_equals");
+        |];
+      );
+      Token (Name "name");
+      Token (Literal ";");
+    ];
+  );
+  "primary_constructor_base_type",
+  Some (
+    Seq [
+      Token (Name "type_name");
+      Token (Name "argument_list");
+    ];
+  );
   "bracketed_parameter_list",
   Some (
     Seq [
       Token (Literal "[");
       Token (Name "formal_parameter_list");
       Token (Literal "]");
+    ];
+  );
+  "semgrep_expression",
+  Some (
+    Seq [
+      Token (Literal "__SEMGREP_EXPRESSION");
+      Token (Name "expression");
     ];
   );
   "delegate_declaration",
@@ -2622,23 +2670,6 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Name "identifier");
       Token (Name "parameter_list");
       Token (Name "function_body");
-    ];
-  );
-  "using_directive",
-  Some (
-    Seq [
-      Opt (
-        Token (Literal "global");
-      );
-      Token (Literal "using");
-      Opt (
-        Alt [|
-          Token (Literal "static");
-          Token (Name "name_equals");
-        |];
-      );
-      Token (Name "name");
-      Token (Literal ";");
     ];
   );
   "constructor_initializer",
@@ -2734,13 +2765,6 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal ";");
     ];
   );
-  "semgrep_expression",
-  Some (
-    Seq [
-      Token (Literal "__SEMGREP_EXPRESSION");
-      Token (Name "expression");
-    ];
-  );
   "accessor_declaration",
   Some (
     Seq [
@@ -2768,12 +2792,36 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal ".");
     ];
   );
-  "primary_constructor_base_type",
+  "record_base",
   Some (
-    Seq [
-      Token (Name "type_name");
-      Token (Name "argument_list");
-    ];
+    Alt [|
+      Seq [
+        Token (Literal ":");
+        Token (Name "type_name");
+        Repeat (
+          Seq [
+            Token (Literal ",");
+            Token (Name "type_name");
+          ];
+        );
+      ];
+      Seq [
+        Token (Literal ":");
+        Token (Name "primary_constructor_base_type");
+        Opt (
+          Seq [
+            Token (Literal ",");
+            Token (Name "type_name");
+            Repeat (
+              Seq [
+                Token (Literal ",");
+                Token (Name "type_name");
+              ];
+            );
+          ];
+        );
+      ];
+    |];
   );
   "constructor_declaration",
   Some (
@@ -2894,37 +2942,6 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Name "function_body");
     ];
   );
-  "record_base",
-  Some (
-    Alt [|
-      Seq [
-        Token (Literal ":");
-        Token (Name "type_name");
-        Repeat (
-          Seq [
-            Token (Literal ",");
-            Token (Name "type_name");
-          ];
-        );
-      ];
-      Seq [
-        Token (Literal ":");
-        Token (Name "primary_constructor_base_type");
-        Opt (
-          Seq [
-            Token (Literal ",");
-            Token (Name "type_name");
-            Repeat (
-              Seq [
-                Token (Literal ",");
-                Token (Name "type_name");
-              ];
-            );
-          ];
-        );
-      ];
-    |];
-  );
   "enum_declaration",
   Some (
     Seq [
@@ -2940,9 +2957,31 @@ let children_regexps : (string * Run.exp option) list = [
         Token (Name "base_list");
       );
       Token (Name "enum_member_declaration_list");
-      Opt (
-        Token (Literal ";");
+      Token (Name "opt_semi");
+    ];
+  );
+  "indexer_declaration",
+  Some (
+    Seq [
+      Repeat (
+        Token (Name "attribute_list");
       );
+      Repeat (
+        Token (Name "modifier");
+      );
+      Token (Name "type");
+      Opt (
+        Token (Name "explicit_interface_specifier");
+      );
+      Token (Literal "this");
+      Token (Name "bracketed_parameter_list");
+      Alt [|
+        Token (Name "accessor_list");
+        Seq [
+          Token (Name "arrow_expression_clause");
+          Token (Literal ";");
+        ];
+      |];
     ];
   );
   "property_declaration",
@@ -2970,30 +3009,6 @@ let children_regexps : (string * Run.exp option) list = [
             ];
           );
         ];
-        Seq [
-          Token (Name "arrow_expression_clause");
-          Token (Literal ";");
-        ];
-      |];
-    ];
-  );
-  "indexer_declaration",
-  Some (
-    Seq [
-      Repeat (
-        Token (Name "attribute_list");
-      );
-      Repeat (
-        Token (Name "modifier");
-      );
-      Token (Name "type");
-      Opt (
-        Token (Name "explicit_interface_specifier");
-      );
-      Token (Literal "this");
-      Token (Name "bracketed_parameter_list");
-      Alt [|
-        Token (Name "accessor_list");
         Seq [
           Token (Name "arrow_expression_clause");
           Token (Literal ";");
@@ -3043,9 +3058,7 @@ let children_regexps : (string * Run.exp option) list = [
         Token (Name "type_parameter_constraints_clause");
       );
       Token (Name "declaration_list");
-      Opt (
-        Token (Literal ";");
-      );
+      Token (Name "opt_semi");
     ];
   );
   "declaration",
@@ -3104,9 +3117,7 @@ let children_regexps : (string * Run.exp option) list = [
         Token (Name "type_parameter_constraints_clause");
       );
       Token (Name "declaration_list");
-      Opt (
-        Token (Literal ";");
-      );
+      Token (Name "opt_semi");
     ];
   );
   "namespace_declaration",
@@ -3115,9 +3126,7 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal "namespace");
       Token (Name "name");
       Token (Name "declaration_list");
-      Opt (
-        Token (Literal ";");
-      );
+      Token (Name "opt_semi");
     ];
   );
   "record_body",
@@ -3154,9 +3163,7 @@ let children_regexps : (string * Run.exp option) list = [
         Token (Name "type_parameter_constraints_clause");
       );
       Token (Name "record_body");
-      Opt (
-        Token (Literal ";");
-      );
+      Token (Name "opt_semi");
     ];
   );
   "record_struct_declaration",
@@ -3184,9 +3191,7 @@ let children_regexps : (string * Run.exp option) list = [
         Token (Name "type_parameter_constraints_clause");
       );
       Token (Name "record_body");
-      Opt (
-        Token (Literal ";");
-      );
+      Token (Name "opt_semi");
     ];
   );
   "struct_declaration",
@@ -3213,9 +3218,7 @@ let children_regexps : (string * Run.exp option) list = [
         Token (Name "type_parameter_constraints_clause");
       );
       Token (Name "declaration_list");
-      Opt (
-        Token (Literal ";");
-      );
+      Token (Name "opt_semi");
     ];
   );
   "type_declaration",
@@ -3380,7 +3383,7 @@ let trans_contextual_keywords ((kind, body) : mt) : CST.contextual_keywords =
       )
   | Leaf _ -> assert false
 
-let trans_predefined_type ((kind, body) : mt) : CST.predefined_type =
+let trans_this_expression ((kind, body) : mt) : CST.this_expression =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
@@ -3435,12 +3438,12 @@ let trans_attribute_target_specifier ((kind, body) : mt) : CST.attribute_target_
   | Leaf _ -> assert false
 
 
-let trans_this_expression ((kind, body) : mt) : CST.this_expression =
+let trans_string_literal_fragment ((kind, body) : mt) : CST.string_literal_fragment =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
 
-let trans_string_literal_fragment ((kind, body) : mt) : CST.string_literal_fragment =
+let trans_string_literal_encoding ((kind, body) : mt) : CST.string_literal_encoding =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
@@ -3459,22 +3462,16 @@ let trans_constructor_constraint ((kind, body) : mt) : CST.constructor_constrain
       )
   | Leaf _ -> assert false
 
-
-let trans_string_literal_encoding ((kind, body) : mt) : CST.string_literal_encoding =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_semgrep_metavariable ((kind, body) : mt) : CST.semgrep_metavariable =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
 let trans_pat_52ffbd7 ((kind, body) : mt) : CST.pat_52ffbd7 =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
 
+
+let trans_predefined_type ((kind, body) : mt) : CST.predefined_type =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
 
 let trans_assignment_operator ((kind, body) : mt) : CST.assignment_operator =
   match body with
@@ -3549,16 +3546,22 @@ let trans_default_switch_label ((kind, body) : mt) : CST.default_switch_label =
       )
   | Leaf _ -> assert false
 
-let trans_verbatim_string_literal ((kind, body) : mt) : CST.verbatim_string_literal =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
 let trans_escape_sequence ((kind, body) : mt) : CST.escape_sequence =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
 
+
+
+let trans_slice_pattern ((kind, body) : mt) : CST.slice_pattern =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_semgrep_variadic_metavariable ((kind, body) : mt) : CST.semgrep_variadic_metavariable =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
 
 let trans_character_literal_unescaped ((kind, body) : mt) : CST.character_literal_unescaped =
   match body with
@@ -3596,11 +3599,6 @@ let trans_continue_statement ((kind, body) : mt) : CST.continue_statement =
       | _ -> assert false
       )
   | Leaf _ -> assert false
-
-let trans_raw_string_literal ((kind, body) : mt) : CST.raw_string_literal =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
 
 let trans_modifier ((kind, body) : mt) : CST.modifier =
   match body with
@@ -3695,6 +3693,11 @@ let trans_integer_literal ((kind, body) : mt) : CST.integer_literal =
   | Leaf v -> v
   | Children _ -> assert false
 
+let trans_verbatim_string_literal ((kind, body) : mt) : CST.verbatim_string_literal =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
 let trans_interpolated_verbatim_string_text_fragment ((kind, body) : mt) : CST.interpolated_verbatim_string_text_fragment =
   match body with
   | Leaf v -> v
@@ -3705,11 +3708,17 @@ let trans_ellipsis ((kind, body) : mt) : CST.ellipsis =
   | Leaf v -> v
   | Children _ -> assert false
 
+
 let trans_interpolated_string_text_fragment ((kind, body) : mt) : CST.interpolated_string_text_fragment =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
 
+
+let trans_opt_semi ((kind, body) : mt) : CST.opt_semi =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
 
 let trans_overloadable_operator ((kind, body) : mt) : CST.overloadable_operator =
   match body with
@@ -3811,7 +3820,6 @@ let trans_overloadable_operator ((kind, body) : mt) : CST.overloadable_operator 
       )
   | Leaf _ -> assert false
 
-
 let trans_null_literal ((kind, body) : mt) : CST.null_literal =
   match body with
   | Leaf v -> v
@@ -3828,18 +3836,18 @@ let trans_base_expression ((kind, body) : mt) : CST.base_expression =
   | Leaf v -> v
   | Children _ -> assert false
 
+let trans_raw_string_literal ((kind, body) : mt) : CST.raw_string_literal =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_semgrep_metavariable ((kind, body) : mt) : CST.semgrep_metavariable =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+
 let trans_real_literal ((kind, body) : mt) : CST.real_literal =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_semgrep_variadic_metavariable ((kind, body) : mt) : CST.semgrep_variadic_metavariable =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-
-let trans_slice_pattern ((kind, body) : mt) : CST.slice_pattern =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
@@ -3920,10 +3928,6 @@ let trans_string_literal ((kind, body) : mt) : CST.string_literal =
       )
   | Leaf _ -> assert false
 
-
-
-
-
 let trans_character_literal ((kind, body) : mt) : CST.character_literal =
   match body with
   | Children v ->
@@ -3944,32 +3948,6 @@ let trans_character_literal ((kind, body) : mt) : CST.character_literal =
             )
             ,
             Run.trans_token (Run.matcher_token v2)
-          )
-      | _ -> assert false
-      )
-  | Leaf _ -> assert false
-
-let trans_identifier ((kind, body) : mt) : CST.identifier =
-  match body with
-  | Children v ->
-      (match v with
-      | Alt (0, v) ->
-          `Choice_id_tok (
-            (match v with
-            | Alt (0, v) ->
-                `Id_tok (
-                  trans_identifier_token (Run.matcher_token v)
-                )
-            | Alt (1, v) ->
-                `Cont_keywos (
-                  trans_contextual_keywords (Run.matcher_token v)
-                )
-            | _ -> assert false
-            )
-          )
-      | Alt (1, v) ->
-          `Semg_meta (
-            trans_semgrep_metavariable (Run.matcher_token v)
           )
       | _ -> assert false
       )
@@ -4015,6 +3993,9 @@ let trans_interpolated_verbatim_string_text ((kind, body) : mt) : CST.interpolat
       )
   | Leaf _ -> assert false
 
+
+
+
 let trans_interpolated_string_text ((kind, body) : mt) : CST.interpolated_string_text =
   match body with
   | Children v ->
@@ -4034,6 +4015,33 @@ let trans_interpolated_string_text ((kind, body) : mt) : CST.interpolated_string
       | _ -> assert false
       )
   | Leaf _ -> assert false
+
+let trans_identifier ((kind, body) : mt) : CST.identifier =
+  match body with
+  | Children v ->
+      (match v with
+      | Alt (0, v) ->
+          `Choice_id_tok (
+            (match v with
+            | Alt (0, v) ->
+                `Id_tok (
+                  trans_identifier_token (Run.matcher_token v)
+                )
+            | Alt (1, v) ->
+                `Cont_keywos (
+                  trans_contextual_keywords (Run.matcher_token v)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (1, v) ->
+          `Semg_meta (
+            trans_semgrep_metavariable (Run.matcher_token v)
+          )
+      | _ -> assert false
+      )
+  | Leaf _ -> assert false
+
 
 
 
@@ -4079,61 +4087,6 @@ let trans_literal ((kind, body) : mt) : CST.literal =
   | Leaf _ -> assert false
 
 
-let rec trans_tuple_pattern ((kind, body) : mt) : CST.tuple_pattern =
-  match body with
-  | Children v ->
-      (match v with
-      | Seq [v0; v1; v2; v3] ->
-          (
-            Run.trans_token (Run.matcher_token v0),
-            (match v1 with
-            | Alt (0, v) ->
-                `Id (
-                  trans_identifier (Run.matcher_token v)
-                )
-            | Alt (1, v) ->
-                `Disc (
-                  trans_discard (Run.matcher_token v)
-                )
-            | Alt (2, v) ->
-                `Tuple_pat (
-                  trans_tuple_pattern (Run.matcher_token v)
-                )
-            | _ -> assert false
-            )
-            ,
-            Run.repeat
-              (fun v ->
-                (match v with
-                | Seq [v0; v1] ->
-                    (
-                      Run.trans_token (Run.matcher_token v0),
-                      (match v1 with
-                      | Alt (0, v) ->
-                          `Id (
-                            trans_identifier (Run.matcher_token v)
-                          )
-                      | Alt (1, v) ->
-                          `Disc (
-                            trans_discard (Run.matcher_token v)
-                          )
-                      | Alt (2, v) ->
-                          `Tuple_pat (
-                            trans_tuple_pattern (Run.matcher_token v)
-                          )
-                      | _ -> assert false
-                      )
-                    )
-                | _ -> assert false
-                )
-              )
-              v2
-            ,
-            Run.trans_token (Run.matcher_token v3)
-          )
-      | _ -> assert false
-      )
-  | Leaf _ -> assert false
 
 let trans_join_into_clause ((kind, body) : mt) : CST.join_into_clause =
   match body with
@@ -4147,7 +4100,6 @@ let trans_join_into_clause ((kind, body) : mt) : CST.join_into_clause =
       | _ -> assert false
       )
   | Leaf _ -> assert false
-
 
 
 let trans_name_equals ((kind, body) : mt) : CST.name_equals =
@@ -4173,7 +4125,6 @@ let trans_name_equals ((kind, body) : mt) : CST.name_equals =
       | _ -> assert false
       )
   | Leaf _ -> assert false
-
 
 let rec trans_parenthesized_variable_designation ((kind, body) : mt) : CST.parenthesized_variable_designation =
   match body with
@@ -4255,6 +4206,63 @@ let trans_name_colon ((kind, body) : mt) : CST.name_colon =
       | _ -> assert false
       )
   | Leaf _ -> assert false
+
+let rec trans_tuple_pattern ((kind, body) : mt) : CST.tuple_pattern =
+  match body with
+  | Children v ->
+      (match v with
+      | Seq [v0; v1; v2; v3] ->
+          (
+            Run.trans_token (Run.matcher_token v0),
+            (match v1 with
+            | Alt (0, v) ->
+                `Id (
+                  trans_identifier (Run.matcher_token v)
+                )
+            | Alt (1, v) ->
+                `Disc (
+                  trans_discard (Run.matcher_token v)
+                )
+            | Alt (2, v) ->
+                `Tuple_pat (
+                  trans_tuple_pattern (Run.matcher_token v)
+                )
+            | _ -> assert false
+            )
+            ,
+            Run.repeat
+              (fun v ->
+                (match v with
+                | Seq [v0; v1] ->
+                    (
+                      Run.trans_token (Run.matcher_token v0),
+                      (match v1 with
+                      | Alt (0, v) ->
+                          `Id (
+                            trans_identifier (Run.matcher_token v)
+                          )
+                      | Alt (1, v) ->
+                          `Disc (
+                            trans_discard (Run.matcher_token v)
+                          )
+                      | Alt (2, v) ->
+                          `Tuple_pat (
+                            trans_tuple_pattern (Run.matcher_token v)
+                          )
+                      | _ -> assert false
+                      )
+                    )
+                | _ -> assert false
+                )
+              )
+              v2
+            ,
+            Run.trans_token (Run.matcher_token v3)
+          )
+      | _ -> assert false
+      )
+  | Leaf _ -> assert false
+
 
 let trans_extern_alias_directive ((kind, body) : mt) : CST.extern_alias_directive =
   match body with
@@ -5651,6 +5659,51 @@ and trans_expression_statement ((kind, body) : mt) : CST.expression_statement =
       | Alt (2, v) ->
           `Ellips (
             trans_ellipsis (Run.matcher_token v)
+          )
+      | Alt (3, v) ->
+          `Deep_ellips_SEMI (
+            (match v with
+            | Seq [v0; v1] ->
+                (
+                  trans_deep_ellipsis (Run.matcher_token v0),
+                  Run.trans_token (Run.matcher_token v1)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (4, v) ->
+          `Member_access_ellips_exp_SEMI (
+            (match v with
+            | Seq [v0; v1] ->
+                (
+                  trans_member_access_ellipsis_expression (Run.matcher_token v0)
+                  ,
+                  Run.trans_token (Run.matcher_token v1)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (5, v) ->
+          `Semg_meta_SEMI (
+            (match v with
+            | Seq [v0; v1] ->
+                (
+                  trans_semgrep_metavariable (Run.matcher_token v0),
+                  Run.trans_token (Run.matcher_token v1)
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (6, v) ->
+          `Typed_meta_SEMI (
+            (match v with
+            | Seq [v0; v1] ->
+                (
+                  trans_typed_metavariable (Run.matcher_token v0),
+                  Run.trans_token (Run.matcher_token v1)
+                )
+            | _ -> assert false
+            )
           )
       | _ -> assert false
       )
@@ -8981,6 +9034,53 @@ and trans_yield_statement ((kind, body) : mt) : CST.yield_statement =
       )
   | Leaf _ -> assert false
 
+let trans_using_directive ((kind, body) : mt) : CST.using_directive =
+  match body with
+  | Children v ->
+      (match v with
+      | Seq [v0; v1; v2; v3; v4] ->
+          (
+            Run.opt
+              (fun v -> Run.trans_token (Run.matcher_token v))
+              v0
+            ,
+            Run.trans_token (Run.matcher_token v1),
+            Run.opt
+              (fun v ->
+                (match v with
+                | Alt (0, v) ->
+                    `Static (
+                      Run.trans_token (Run.matcher_token v)
+                    )
+                | Alt (1, v) ->
+                    `Name_equals (
+                      trans_name_equals (Run.matcher_token v)
+                    )
+                | _ -> assert false
+                )
+              )
+              v2
+            ,
+            trans_name (Run.matcher_token v3),
+            Run.trans_token (Run.matcher_token v4)
+          )
+      | _ -> assert false
+      )
+  | Leaf _ -> assert false
+
+let trans_primary_constructor_base_type ((kind, body) : mt) : CST.primary_constructor_base_type =
+  match body with
+  | Children v ->
+      (match v with
+      | Seq [v0; v1] ->
+          (
+            trans_type_name (Run.matcher_token v0),
+            trans_argument_list (Run.matcher_token v1)
+          )
+      | _ -> assert false
+      )
+  | Leaf _ -> assert false
+
 let trans_bracketed_parameter_list ((kind, body) : mt) : CST.bracketed_parameter_list =
   match body with
   | Children v ->
@@ -8990,6 +9090,19 @@ let trans_bracketed_parameter_list ((kind, body) : mt) : CST.bracketed_parameter
             Run.trans_token (Run.matcher_token v0),
             trans_formal_parameter_list (Run.matcher_token v1),
             Run.trans_token (Run.matcher_token v2)
+          )
+      | _ -> assert false
+      )
+  | Leaf _ -> assert false
+
+let trans_semgrep_expression ((kind, body) : mt) : CST.semgrep_expression =
+  match body with
+  | Children v ->
+      (match v with
+      | Seq [v0; v1] ->
+          (
+            Run.trans_token (Run.matcher_token v0),
+            trans_expression (Run.matcher_token v1)
           )
       | _ -> assert false
       )
@@ -9047,40 +9160,6 @@ let trans_destructor_declaration ((kind, body) : mt) : CST.destructor_declaratio
             trans_identifier (Run.matcher_token v3),
             trans_parameter_list (Run.matcher_token v4),
             trans_function_body (Run.matcher_token v5)
-          )
-      | _ -> assert false
-      )
-  | Leaf _ -> assert false
-
-let trans_using_directive ((kind, body) : mt) : CST.using_directive =
-  match body with
-  | Children v ->
-      (match v with
-      | Seq [v0; v1; v2; v3; v4] ->
-          (
-            Run.opt
-              (fun v -> Run.trans_token (Run.matcher_token v))
-              v0
-            ,
-            Run.trans_token (Run.matcher_token v1),
-            Run.opt
-              (fun v ->
-                (match v with
-                | Alt (0, v) ->
-                    `Static (
-                      Run.trans_token (Run.matcher_token v)
-                    )
-                | Alt (1, v) ->
-                    `Name_equals (
-                      trans_name_equals (Run.matcher_token v)
-                    )
-                | _ -> assert false
-                )
-              )
-              v2
-            ,
-            trans_name (Run.matcher_token v3),
-            Run.trans_token (Run.matcher_token v4)
           )
       | _ -> assert false
       )
@@ -9273,19 +9352,6 @@ let trans_field_declaration ((kind, body) : mt) : CST.field_declaration =
       )
   | Leaf _ -> assert false
 
-let trans_semgrep_expression ((kind, body) : mt) : CST.semgrep_expression =
-  match body with
-  | Children v ->
-      (match v with
-      | Seq [v0; v1] ->
-          (
-            Run.trans_token (Run.matcher_token v0),
-            trans_expression (Run.matcher_token v1)
-          )
-      | _ -> assert false
-      )
-  | Leaf _ -> assert false
-
 let trans_accessor_declaration ((kind, body) : mt) : CST.accessor_declaration =
   match body with
   | Children v ->
@@ -9347,14 +9413,67 @@ let trans_explicit_interface_specifier ((kind, body) : mt) : CST.explicit_interf
       )
   | Leaf _ -> assert false
 
-let trans_primary_constructor_base_type ((kind, body) : mt) : CST.primary_constructor_base_type =
+let trans_record_base ((kind, body) : mt) : CST.record_base =
   match body with
   | Children v ->
       (match v with
-      | Seq [v0; v1] ->
-          (
-            trans_type_name (Run.matcher_token v0),
-            trans_argument_list (Run.matcher_token v1)
+      | Alt (0, v) ->
+          `COLON_type_name_rep_COMMA_type_name (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  Run.trans_token (Run.matcher_token v0),
+                  trans_type_name (Run.matcher_token v1),
+                  Run.repeat
+                    (fun v ->
+                      (match v with
+                      | Seq [v0; v1] ->
+                          (
+                            Run.trans_token (Run.matcher_token v0),
+                            trans_type_name (Run.matcher_token v1)
+                          )
+                      | _ -> assert false
+                      )
+                    )
+                    v2
+                )
+            | _ -> assert false
+            )
+          )
+      | Alt (1, v) ->
+          `COLON_prim_cons_base_type_opt_COMMA_type_name_rep_COMMA_type_name (
+            (match v with
+            | Seq [v0; v1; v2] ->
+                (
+                  Run.trans_token (Run.matcher_token v0),
+                  trans_primary_constructor_base_type (Run.matcher_token v1),
+                  Run.opt
+                    (fun v ->
+                      (match v with
+                      | Seq [v0; v1; v2] ->
+                          (
+                            Run.trans_token (Run.matcher_token v0),
+                            trans_type_name (Run.matcher_token v1),
+                            Run.repeat
+                              (fun v ->
+                                (match v with
+                                | Seq [v0; v1] ->
+                                    (
+                                      Run.trans_token (Run.matcher_token v0),
+                                      trans_type_name (Run.matcher_token v1)
+                                    )
+                                | _ -> assert false
+                                )
+                              )
+                              v2
+                          )
+                      | _ -> assert false
+                      )
+                    )
+                    v2
+                )
+            | _ -> assert false
+            )
           )
       | _ -> assert false
       )
@@ -9564,72 +9683,6 @@ let trans_conversion_operator_declaration ((kind, body) : mt) : CST.conversion_o
       )
   | Leaf _ -> assert false
 
-let trans_record_base ((kind, body) : mt) : CST.record_base =
-  match body with
-  | Children v ->
-      (match v with
-      | Alt (0, v) ->
-          `COLON_type_name_rep_COMMA_type_name (
-            (match v with
-            | Seq [v0; v1; v2] ->
-                (
-                  Run.trans_token (Run.matcher_token v0),
-                  trans_type_name (Run.matcher_token v1),
-                  Run.repeat
-                    (fun v ->
-                      (match v with
-                      | Seq [v0; v1] ->
-                          (
-                            Run.trans_token (Run.matcher_token v0),
-                            trans_type_name (Run.matcher_token v1)
-                          )
-                      | _ -> assert false
-                      )
-                    )
-                    v2
-                )
-            | _ -> assert false
-            )
-          )
-      | Alt (1, v) ->
-          `COLON_prim_cons_base_type_opt_COMMA_type_name_rep_COMMA_type_name (
-            (match v with
-            | Seq [v0; v1; v2] ->
-                (
-                  Run.trans_token (Run.matcher_token v0),
-                  trans_primary_constructor_base_type (Run.matcher_token v1),
-                  Run.opt
-                    (fun v ->
-                      (match v with
-                      | Seq [v0; v1; v2] ->
-                          (
-                            Run.trans_token (Run.matcher_token v0),
-                            trans_type_name (Run.matcher_token v1),
-                            Run.repeat
-                              (fun v ->
-                                (match v with
-                                | Seq [v0; v1] ->
-                                    (
-                                      Run.trans_token (Run.matcher_token v0),
-                                      trans_type_name (Run.matcher_token v1)
-                                    )
-                                | _ -> assert false
-                                )
-                              )
-                              v2
-                          )
-                      | _ -> assert false
-                      )
-                    )
-                    v2
-                )
-            | _ -> assert false
-            )
-          )
-      | _ -> assert false
-      )
-  | Leaf _ -> assert false
-
 let trans_enum_declaration ((kind, body) : mt) : CST.enum_declaration =
   match body with
   | Children v ->
@@ -9651,9 +9704,53 @@ let trans_enum_declaration ((kind, body) : mt) : CST.enum_declaration =
               v4
             ,
             trans_enum_member_declaration_list (Run.matcher_token v5),
+            trans_opt_semi (Run.matcher_token v6)
+          )
+      | _ -> assert false
+      )
+  | Leaf _ -> assert false
+
+let trans_indexer_declaration ((kind, body) : mt) : CST.indexer_declaration =
+  match body with
+  | Children v ->
+      (match v with
+      | Seq [v0; v1; v2; v3; v4; v5; v6] ->
+          (
+            Run.repeat
+              (fun v -> trans_attribute_list (Run.matcher_token v))
+              v0
+            ,
+            Run.repeat
+              (fun v -> trans_modifier (Run.matcher_token v))
+              v1
+            ,
+            trans_type_ (Run.matcher_token v2),
             Run.opt
-              (fun v -> Run.trans_token (Run.matcher_token v))
-              v6
+              (fun v ->
+                trans_explicit_interface_specifier (Run.matcher_token v)
+              )
+              v3
+            ,
+            Run.trans_token (Run.matcher_token v4),
+            trans_bracketed_parameter_list (Run.matcher_token v5),
+            (match v6 with
+            | Alt (0, v) ->
+                `Acce_list (
+                  trans_accessor_list (Run.matcher_token v)
+                )
+            | Alt (1, v) ->
+                `Arrow_exp_clause_SEMI (
+                  (match v with
+                  | Seq [v0; v1] ->
+                      (
+                        trans_arrow_expression_clause (Run.matcher_token v0),
+                        Run.trans_token (Run.matcher_token v1)
+                      )
+                  | _ -> assert false
+                  )
+                )
+            | _ -> assert false
+            )
           )
       | _ -> assert false
       )
@@ -9704,52 +9801,6 @@ let trans_property_declaration ((kind, body) : mt) : CST.property_declaration =
                       )
                   | _ -> assert false
                   )
-                )
-            | Alt (1, v) ->
-                `Arrow_exp_clause_SEMI (
-                  (match v with
-                  | Seq [v0; v1] ->
-                      (
-                        trans_arrow_expression_clause (Run.matcher_token v0),
-                        Run.trans_token (Run.matcher_token v1)
-                      )
-                  | _ -> assert false
-                  )
-                )
-            | _ -> assert false
-            )
-          )
-      | _ -> assert false
-      )
-  | Leaf _ -> assert false
-
-let trans_indexer_declaration ((kind, body) : mt) : CST.indexer_declaration =
-  match body with
-  | Children v ->
-      (match v with
-      | Seq [v0; v1; v2; v3; v4; v5; v6] ->
-          (
-            Run.repeat
-              (fun v -> trans_attribute_list (Run.matcher_token v))
-              v0
-            ,
-            Run.repeat
-              (fun v -> trans_modifier (Run.matcher_token v))
-              v1
-            ,
-            trans_type_ (Run.matcher_token v2),
-            Run.opt
-              (fun v ->
-                trans_explicit_interface_specifier (Run.matcher_token v)
-              )
-              v3
-            ,
-            Run.trans_token (Run.matcher_token v4),
-            trans_bracketed_parameter_list (Run.matcher_token v5),
-            (match v6 with
-            | Alt (0, v) ->
-                `Acce_list (
-                  trans_accessor_list (Run.matcher_token v)
                 )
             | Alt (1, v) ->
                 `Arrow_exp_clause_SEMI (
@@ -9839,9 +9890,7 @@ let rec trans_class_declaration ((kind, body) : mt) : CST.class_declaration =
               v6
             ,
             trans_declaration_list (Run.matcher_token v7),
-            Run.opt
-              (fun v -> Run.trans_token (Run.matcher_token v))
-              v8
+            trans_opt_semi (Run.matcher_token v8)
           )
       | _ -> assert false
       )
@@ -9983,9 +10032,7 @@ and trans_interface_declaration ((kind, body) : mt) : CST.interface_declaration 
               v6
             ,
             trans_declaration_list (Run.matcher_token v7),
-            Run.opt
-              (fun v -> Run.trans_token (Run.matcher_token v))
-              v8
+            trans_opt_semi (Run.matcher_token v8)
           )
       | _ -> assert false
       )
@@ -10000,9 +10047,7 @@ and trans_namespace_declaration ((kind, body) : mt) : CST.namespace_declaration 
             Run.trans_token (Run.matcher_token v0),
             trans_name (Run.matcher_token v1),
             trans_declaration_list (Run.matcher_token v2),
-            Run.opt
-              (fun v -> Run.trans_token (Run.matcher_token v))
-              v3
+            trans_opt_semi (Run.matcher_token v3)
           )
       | _ -> assert false
       )
@@ -10063,9 +10108,7 @@ and trans_record_declaration ((kind, body) : mt) : CST.record_declaration =
               v8
             ,
             trans_record_body (Run.matcher_token v9),
-            Run.opt
-              (fun v -> Run.trans_token (Run.matcher_token v))
-              v10
+            trans_opt_semi (Run.matcher_token v10)
           )
       | _ -> assert false
       )
@@ -10107,9 +10150,7 @@ and trans_record_struct_declaration ((kind, body) : mt) : CST.record_struct_decl
               v8
             ,
             trans_record_body (Run.matcher_token v9),
-            Run.opt
-              (fun v -> Run.trans_token (Run.matcher_token v))
-              v10
+            trans_opt_semi (Run.matcher_token v10)
           )
       | _ -> assert false
       )
@@ -10150,9 +10191,7 @@ and trans_struct_declaration ((kind, body) : mt) : CST.struct_declaration =
               v7
             ,
             trans_declaration_list (Run.matcher_token v8),
-            Run.opt
-              (fun v -> Run.trans_token (Run.matcher_token v))
-              v9
+            trans_opt_semi (Run.matcher_token v9)
           )
       | _ -> assert false
       )

@@ -1,6 +1,6 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: aaafc3d75f058ca5fe639b7ed5829964a3ca4575
+Latest commit in repo: fb8e32dfb03681eff6bae40b5c7669ca4f9f9bc5
 Last change in file:
   commit 2162260aec4c7d7d4b43ef2287388adcc302c8d6
   Author: Damien Guard <damieng@gmail.com>
@@ -10,25 +10,21 @@ Last change in file:
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: aaafc3d75f058ca5fe639b7ed5829964a3ca4575
+Latest commit in repo: fb8e32dfb03681eff6bae40b5c7669ca4f9f9bc5
 Last change in file:
-  commit 997e9f4972960a95c1669e6b5d7b97c4fe3aeb50
-  Author: Tamas Vajk <tamasvajk@github.com>
-  Date:   Wed May 10 11:19:30 2023 +0200
+  commit fb8e32dfb03681eff6bae40b5c7669ca4f9f9bc5
+  Author: Brandon Wu <49291449+brandonspark@users.noreply.github.com>
+  Date:   Tue Jun 13 03:04:43 2023 -0400
   
-      Fix unhandled parameter modifier combination
+      fix: make optional semicolons external to avoid intensive build times (#309)
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 49516d0043dc982352523c434dabb3372b4e30b8
+Latest commit in repo: 8bd07d4c1df9ec13159cd1a3478cb8cb1f7ce280
 Last change in file:
-  commit ee1c82b89fc920d001576d140f8d14323cb8ef81
-  Author: pad <pad@r2c.dev>
-  Date:   Tue May 30 13:04:52 2023 +0200
+  commit 9695d12a04eafc7b62d0b5a7ab4ad153a4ca362b
+  Author: brandonspark <wu.brandonj@gmail.com>
+  Date:   Tue Jun 13 18:56:58 2023 -0400
   
-      C#: support ellispis in enum declarations
-      
-      test plan:
-      test file included
-      ./test-lang c-sharp
+      fix semgrep constructs with expression statement
 ---
