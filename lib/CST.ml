@@ -1755,6 +1755,7 @@ type type_declaration = [
   | `Dele_decl of delegate_declaration
   | `Record_decl of record_declaration
   | `Record_struct_decl of record_struct_declaration
+  | `Ellips of Token.t (* "..." *)
 ]
 
 type namespace_member_declaration = [
@@ -1763,7 +1764,9 @@ type namespace_member_declaration = [
 ]
 
 type file_scoped_namespace_declaration = (
-    Token.t (* "namespace" *)
+    global_statement list (* zero or more *)
+  * namespace_member_declaration list (* zero or more *)
+  * Token.t (* "namespace" *)
   * type_name
   * Token.t (* ";" *)
   * extern_alias_directive list (* zero or more *)

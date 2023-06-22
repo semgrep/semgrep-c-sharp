@@ -20,11 +20,11 @@ Last change in file:
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 8bd07d4c1df9ec13159cd1a3478cb8cb1f7ce280
+Latest commit in repo: e61fe5570c1377a70b03c18066e1cc820ab3a9de
 Last change in file:
-  commit 9695d12a04eafc7b62d0b5a7ab4ad153a4ca362b
+  commit 3671900285df527d387f8adbcf83cca532e20a1a
   Author: brandonspark <wu.brandonj@gmail.com>
-  Date:   Tue Jun 13 18:56:58 2023 -0400
+  Date:   Fri Jun 16 15:49:40 2023 -0400
   
-      fix semgrep constructs with expression statement
+      fix: c# top level ellipses
 ---

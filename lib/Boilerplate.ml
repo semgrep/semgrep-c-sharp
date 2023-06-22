@@ -4116,6 +4116,9 @@ let map_type_declaration (env : env) (x : CST.type_declaration) =
   | `Record_struct_decl x -> R.Case ("Record_struct_decl",
       map_record_struct_declaration env x
     )
+  | `Ellips tok -> R.Case ("Ellips",
+      (* "..." *) token env tok
+    )
   )
 
 let map_namespace_member_declaration (env : env) (x : CST.namespace_member_declaration) =
@@ -4128,16 +4131,20 @@ let map_namespace_member_declaration (env : env) (x : CST.namespace_member_decla
     )
   )
 
-let map_file_scoped_namespace_declaration (env : env) ((v1, v2, v3, v4, v5, v6) : CST.file_scoped_namespace_declaration) =
-  let v1 = (* "namespace" *) token env v1 in
-  let v2 = map_type_name env v2 in
-  let v3 = (* ";" *) token env v3 in
-  let v4 =
-    R.List (List.map (map_extern_alias_directive env) v4)
+let map_file_scoped_namespace_declaration (env : env) ((v1, v2, v3, v4, v5, v6, v7, v8) : CST.file_scoped_namespace_declaration) =
+  let v1 = R.List (List.map (map_global_statement env) v1) in
+  let v2 =
+    R.List (List.map (map_namespace_member_declaration env) v2)
   in
-  let v5 = R.List (List.map (map_using_directive env) v5) in
-  let v6 = R.List (List.map (map_type_declaration env) v6) in
-  R.Tuple [v1; v2; v3; v4; v5; v6]
+  let v3 = (* "namespace" *) token env v3 in
+  let v4 = map_type_name env v4 in
+  let v5 = (* ";" *) token env v5 in
+  let v6 =
+    R.List (List.map (map_extern_alias_directive env) v6)
+  in
+  let v7 = R.List (List.map (map_using_directive env) v7) in
+  let v8 = R.List (List.map (map_type_declaration env) v8) in
+  R.Tuple [v1; v2; v3; v4; v5; v6; v7; v8]
 
 let map_compilation_unit (env : env) (x : CST.compilation_unit) =
   (match x with

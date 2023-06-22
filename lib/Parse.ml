@@ -3231,6 +3231,7 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Name "delegate_declaration");
       Token (Name "record_declaration");
       Token (Name "record_struct_declaration");
+      Token (Name "ellipsis");
     |];
   );
   "namespace_member_declaration",
@@ -3243,6 +3244,12 @@ let children_regexps : (string * Run.exp option) list = [
   "file_scoped_namespace_declaration",
   Some (
     Seq [
+      Repeat (
+        Token (Name "global_statement");
+      );
+      Repeat (
+        Token (Name "namespace_member_declaration");
+      );
       Token (Literal "namespace");
       Token (Name "name");
       Token (Literal ";");
@@ -10229,6 +10236,10 @@ let trans_type_declaration ((kind, body) : mt) : CST.type_declaration =
           `Record_struct_decl (
             trans_record_struct_declaration (Run.matcher_token v)
           )
+      | Alt (7, v) ->
+          `Ellips (
+            trans_ellipsis (Run.matcher_token v)
+          )
       | _ -> assert false
       )
   | Leaf _ -> assert false
@@ -10253,24 +10264,34 @@ let trans_file_scoped_namespace_declaration ((kind, body) : mt) : CST.file_scope
   match body with
   | Children v ->
       (match v with
-      | Seq [v0; v1; v2; v3; v4; v5] ->
+      | Seq [v0; v1; v2; v3; v4; v5; v6; v7] ->
           (
-            Run.trans_token (Run.matcher_token v0),
-            trans_name (Run.matcher_token v1),
+            Run.repeat
+              (fun v -> trans_global_statement (Run.matcher_token v))
+              v0
+            ,
+            Run.repeat
+              (fun v ->
+                trans_namespace_member_declaration (Run.matcher_token v)
+              )
+              v1
+            ,
             Run.trans_token (Run.matcher_token v2),
+            trans_name (Run.matcher_token v3),
+            Run.trans_token (Run.matcher_token v4),
             Run.repeat
               (fun v ->
                 trans_extern_alias_directive (Run.matcher_token v)
               )
-              v3
+              v5
             ,
             Run.repeat
               (fun v -> trans_using_directive (Run.matcher_token v))
-              v4
+              v6
             ,
             Run.repeat
               (fun v -> trans_type_declaration (Run.matcher_token v))
-              v5
+              v7
           )
       | _ -> assert false
       )
