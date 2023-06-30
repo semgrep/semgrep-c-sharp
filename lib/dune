@@ -1,7 +1,6 @@
 (library
   (public_name tree-sitter-lang.c-sharp)
   (name tree_sitter_c_sharp)
-  (preprocess (pps ppx_sexp_conv))
   (libraries atdgen-runtime tree-sitter.run)
 
   ; A copy of the C headers for the tree-sitter library is found locally.
