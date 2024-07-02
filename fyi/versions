@@ -1,6 +1,6 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: fb8e32dfb03681eff6bae40b5c7669ca4f9f9bc5
+Latest commit in repo: e1384e2f132936019b43aaaae154cd780fb497ce
 Last change in file:
   commit 2162260aec4c7d7d4b43ef2287388adcc302c8d6
   Author: Damien Guard <damieng@gmail.com>
@@ -10,17 +10,26 @@ Last change in file:
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: fb8e32dfb03681eff6bae40b5c7669ca4f9f9bc5
+Latest commit in repo: e1384e2f132936019b43aaaae154cd780fb497ce
 Last change in file:
-  commit fb8e32dfb03681eff6bae40b5c7669ca4f9f9bc5
-  Author: Brandon Wu <49291449+brandonspark@users.noreply.github.com>
-  Date:   Tue Jun 13 03:04:43 2023 -0400
+  commit dd5e59721a5f8dae34604060833902b882023aaf
+  Author: Mathew Payne <2772944+GeekMasher@users.noreply.github.com>
+  Date:   Wed Nov 29 20:35:51 2023 +0000
   
-      fix: make optional semicolons external to avoid intensive build times (#309)
+      Support for do and while loops named fields (#324)
+      
+      * Support for do and while loops named fields
+      
+      - both `body` and `condition` fields
+      - updated parser
+      
+      * Update tests
+      
+      * Update file sizes
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 25eb6429f855ffe39a6e63343f5652f9be84c89d
+Latest commit in repo: 2700b86d4eec534f3308f3b8e79c0789b2a6dd22
 Last change in file:
   commit 3671900285df527d387f8adbcf83cca532e20a1a
   Author: brandonspark <wu.brandonj@gmail.com>
