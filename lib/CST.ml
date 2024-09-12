@@ -2420,3 +2420,10 @@ type event_declaration (* inlined *) = (
   * implicit_parameter_list
   * [ `Acce_list of accessor_list | `SEMI of Token.t (* ";" *) ]
 )
+
+type extra = 
+    Comment of Loc.t * comment
+  | Preprocessor_call of Loc.t * preprocessor_call
+
+
+type extras = extra list

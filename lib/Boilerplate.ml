@@ -4185,7 +4185,84 @@ let map_compilation_unit (env : env) (x : CST.compilation_unit) =
     )
   )
 
+let map_comment (env : env) (tok : CST.comment) =
+  (* comment *) token env tok
+
+let map_preprocessor_call (env : env) ((v1, v2, v3) : CST.preprocessor_call) =
+  let v1 = (* pattern #[ \t]* *) token env v1 in
+  let v2 =
+    (match v2 with
+    | `Null_dire x -> R.Case ("Null_dire",
+        map_nullable_directive env x
+      )
+    | `Define_dire x -> R.Case ("Define_dire",
+        map_define_directive env x
+      )
+    | `Undef_dire x -> R.Case ("Undef_dire",
+        map_undef_directive env x
+      )
+    | `If_dire x -> R.Case ("If_dire",
+        map_if_directive env x
+      )
+    | `Else_dire tok -> R.Case ("Else_dire",
+        (* "else" *) token env tok
+      )
+    | `Elif_dire x -> R.Case ("Elif_dire",
+        map_elif_directive env x
+      )
+    | `Endif_dire tok -> R.Case ("Endif_dire",
+        (* "endif" *) token env tok
+      )
+    | `Region_dire x -> R.Case ("Region_dire",
+        map_region_directive env x
+      )
+    | `Endr_dire x -> R.Case ("Endr_dire",
+        map_endregion_directive env x
+      )
+    | `Error_dire x -> R.Case ("Error_dire",
+        map_error_directive env x
+      )
+    | `Warn_dire x -> R.Case ("Warn_dire",
+        map_warning_directive env x
+      )
+    | `Line_dire x -> R.Case ("Line_dire",
+        map_line_directive env x
+      )
+    | `Pragma_dire x -> R.Case ("Pragma_dire",
+        map_pragma_directive env x
+      )
+    | `Ref_dire x -> R.Case ("Ref_dire",
+        map_reference_directive env x
+      )
+    | `Load_dire x -> R.Case ("Load_dire",
+        map_load_directive env x
+      )
+    | `Sheb_dire x -> R.Case ("Sheb_dire",
+        map_shebang_directive env x
+      )
+    )
+  in
+  let v3 = (* preproc_directive_end *) token env v3 in
+  R.Tuple [v1; v2; v3]
+
 let dump_tree root =
   map_compilation_unit () root
-  |> Tree_sitter_run.Raw_tree.to_string
-  |> print_string
+  |> Tree_sitter_run.Raw_tree.to_channel stdout
+
+let map_extra (env : env) (x : CST.extra) =
+  match x with
+  | Comment (_loc, x) -> ("comment", "comment", map_comment env x)
+  | Preprocessor_call (_loc, x) -> ("preprocessor_call", "preprocessor_call", map_preprocessor_call env x)
+
+let dump_extras (extras : CST.extras) =
+  List.iter (fun extra ->
+    let ts_rule_name, ocaml_type_name, raw_tree = map_extra () extra in
+    let details =
+      if ocaml_type_name <> ts_rule_name then
+        Printf.sprintf " (OCaml type '%s')" ocaml_type_name
+      else
+        ""
+    in
+    Printf.printf "%s%s:\n" ts_rule_name details;
+    Tree_sitter_run.Raw_tree.to_channel stdout raw_tree
+  ) extras
