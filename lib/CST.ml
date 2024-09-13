@@ -2421,9 +2421,9 @@ type event_declaration (* inlined *) = (
   * [ `Acce_list of accessor_list | `SEMI of Token.t (* ";" *) ]
 )
 
-type extra = 
-    Comment of Loc.t * comment
-  | Preprocessor_call of Loc.t * preprocessor_call
-
+type extra = [
+    `Comment of Loc.t * comment
+  | `Preprocessor_call of Loc.t * preprocessor_call
+]
 
 type extras = extra list
