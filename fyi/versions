@@ -1,39 +1,30 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: e1384e2f132936019b43aaaae154cd780fb497ce
+Latest commit in repo: fd7f7402db6e66afd70b402fb2e367b2d71c10d6
 Last change in file:
-  commit 2162260aec4c7d7d4b43ef2287388adcc302c8d6
-  Author: Damien Guard <damieng@gmail.com>
-  Date:   Wed Jan 11 23:17:42 2023 +0000
+  commit bf99ce8e40358bd215b06727b07ecc3f1e575afb
+  Author: Amaan Qureshi <amaanq12@gmail.com>
+  Date:   Tue Apr 30 14:57:27 2024 -0400
   
-      Update copyright notice
+      build: update bindings and manifests
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: e1384e2f132936019b43aaaae154cd780fb497ce
+Latest commit in repo: fd7f7402db6e66afd70b402fb2e367b2d71c10d6
 Last change in file:
-  commit dd5e59721a5f8dae34604060833902b882023aaf
-  Author: Mathew Payne <2772944+GeekMasher@users.noreply.github.com>
-  Date:   Wed Nov 29 20:35:51 2023 +0000
+  commit ca97baabdc69ef587bd65950a2dc803e519017f6
+  Author: Amaan Qureshi <amaanq12@gmail.com>
+  Date:   Sun Sep 1 05:41:18 2024 -0400
   
-      Support for do and while loops named fields (#324)
-      
-      * Support for do and while loops named fields
-      
-      - both `body` and `condition` fields
-      - updated parser
-      
-      * Update tests
-      
-      * Update file sizes
+      fix: properly handle nested strings of different types inside interpolations
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 832487a457ac4b3a0ffeaddb1d8d8e3d4118b039
+Latest commit in repo: db3cedacd317e67335481a2f5ebced4049be3267
 Last change in file:
-  commit 3671900285df527d387f8adbcf83cca532e20a1a
-  Author: brandonspark <wu.brandonj@gmail.com>
-  Date:   Fri Jun 16 15:49:40 2023 -0400
+  commit f8862c07df7c9b0d6e9f932854af52e6b1d89237
+  Author: Martin Jambon <martin@mjambon.com>
+  Date:   Wed Sep 18 15:46:01 2024 -0700
   
-      fix: c# top level ellipses
+      Update semgrep extensions for C#
 ---
