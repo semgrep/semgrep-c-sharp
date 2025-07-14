@@ -1,26 +1,26 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: e1384e2f132936019b43aaaae154cd780fb497ce
+Latest commit in repo: fd7f7402db6e66afd70b402fb2e367b2d71c10d6
 Last change in file:
-  commit e1384e2f132936019b43aaaae154cd780fb497ce
+  commit bf99ce8e40358bd215b06727b07ecc3f1e575afb
   Author: Amaan Qureshi <amaanq12@gmail.com>
-  Date:   Wed May 1 16:20:19 2024 -0400
+  Date:   Tue Apr 30 14:57:27 2024 -0400
   
-      build: update bindings
+      build: update bindings and manifests
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: e1384e2f132936019b43aaaae154cd780fb497ce
+Latest commit in repo: fd7f7402db6e66afd70b402fb2e367b2d71c10d6
 Last change in file:
-  commit e1384e2f132936019b43aaaae154cd780fb497ce
+  commit ca97baabdc69ef587bd65950a2dc803e519017f6
   Author: Amaan Qureshi <amaanq12@gmail.com>
-  Date:   Wed May 1 16:20:19 2024 -0400
+  Date:   Sun Sep 1 05:41:18 2024 -0400
   
-      build: update bindings
+      fix: properly handle nested strings of different types inside interpolations
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 091f5438fc0c15b80217f00e5b94ec0e55517383
+Latest commit in repo: c1b912feab9fbe7df23f4e095ae81cb2424144f9
 Last change in file:
   commit dbb53feb5fe778e61d9feb6a899df3c2e346919f
   Author: Martin Jambon <martin@r2c.dev>
