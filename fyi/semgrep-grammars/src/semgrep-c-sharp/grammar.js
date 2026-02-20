@@ -23,7 +23,7 @@ module.exports = grammar(standard_grammar, {
 
   conflicts: ($, previous) => [
     ...previous,
-    [$.expression, $.parameter],
+    [$._expression, $.parameter]
   ],
 
   rules: {
@@ -37,7 +37,7 @@ module.exports = grammar(standard_grammar, {
     },
 
     // Alternate "entry point". Allows parsing a standalone expression.
-    semgrep_expression: $ => seq('__SEMGREP_EXPRESSION', $.expression),
+    semgrep_expression: $ => seq('__SEMGREP_EXPRESSION', $._expression),
 
     // Metavariables
     identifier: ($, previous) => {
@@ -66,7 +66,7 @@ module.exports = grammar(standard_grammar, {
       );
     },
 
-    declaration: ($, previous) => {
+    _declaration: ($, previous) => {
       return choice(
         ...previous.members,
         $.ellipsis
@@ -115,7 +115,7 @@ module.exports = grammar(standard_grammar, {
     },
 
     // Expression ellipsis
-    expression: ($, previous) => {
+    _expression: ($, previous) => {
       return choice(
         ...previous.members,
         $.ellipsis,
@@ -127,22 +127,22 @@ module.exports = grammar(standard_grammar, {
 
     // TODO: how to use PREC.DOT from original grammar instead of 18 below?
     member_access_ellipsis_expression : $ => prec(18, seq(
-      field('expression', choice($.expression, $.predefined_type, $._name)),
+      field('expression', choice($._expression, $.predefined_type, $._name)),
       choice('.', '->'),
       $.ellipsis
      )),
 
     // use syntax similar to a cast_expression, but with metavar
     //TODO: use PREC.CAST from original grammar instead of 17 below
-    typed_metavariable: $ => prec(17, prec.dynamic(1, seq(
+    typed_metavariable: $ => prec.right(17, seq(
       '(',
-      field('type', $.type),
+      field('type', $._type),
       field('metavar', $._semgrep_metavariable),
       ')',
-    ))),
+    )),
 
     deep_ellipsis: $ => seq(
-      '<...', $.expression, '...>'
+      '<...', $._expression, '...>'
     ),
 
     ellipsis: $ => '...',
