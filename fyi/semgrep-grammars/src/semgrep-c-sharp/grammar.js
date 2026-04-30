@@ -23,16 +23,35 @@ module.exports = grammar(standard_grammar, {
 
   conflicts: ($, previous) => [
     ...previous,
-    [$._expression, $.parameter]
+    [$._expression, $.parameter],
+    // Top-level property pattern (e.g. `public $T $P { get; init; }`)
+    // overlaps with `implicit_parameter` lookahead on `_type identifier`.
+    [$.implicit_parameter, $.property_declaration],
   ],
 
   rules: {
 
     // Entry point
+    //
+    // We add a bare top-level expression alternative so that Semgrep
+    // patterns like `$X is null`, `$X with { ... }`, `($X) => $E`,
+    // `$X?.$Y`, `typeof($T)`, `$X..$Y`, `$X[..$Y]`, `init $X => $Y`,
+    // `from $X in $Y select $E`, or `$\"hello {$X}\"` parse without
+    // requiring the `__SEMGREP_EXPRESSION` sentinel.
+    //
+    // We also add a bare `property_declaration` alternative so that
+    // `public $T $P { get; init; }` is not mis-parsed as a
+    // `local_declaration_statement` followed by a stray block.
+    //
+    // Both extra alternatives are given a strongly negative dynamic
+    // precedence so they only win when nothing else parses the input —
+    // a normal C# program still resolves through `previous`.
     compilation_unit: ($, previous) => {
       return choice(
         previous,
-        $.semgrep_expression
+        $.semgrep_expression,
+        prec.dynamic(-100, $._expression),
+        prec.dynamic(-100, $.property_declaration)
       );
     },
 
@@ -74,20 +93,20 @@ module.exports = grammar(standard_grammar, {
     },
 
     // We want ellipses to be interchangeable with namespace member declarations, so
-    // we need to add them in to `type_declaration` here. 
-    _type_declaration: ($, previous) => { 
+    // we need to add them in to `type_declaration` here.
+    _type_declaration: ($, previous) => {
       return choice(
         ...previous.members,
         $.ellipsis
       )
     },
 
-    // We do this because a file scoped namespace declaration is a top-level 
-    // thing, but ellipses are more particular. We want ellipses to be used 
+    // We do this because a file scoped namespace declaration is a top-level
+    // thing, but ellipses are more particular. We want ellipses to be used
     // in conjunction with file scoped namespace declarations.
-    // Unfortunately, in the base grammar, we can either have ellipsis 
-    // statements, or a file scoped declaration! That's no good. To play 
-    // around the previous grammar, we simply allow what came before to also 
+    // Unfortunately, in the base grammar, we can either have ellipsis
+    // statements, or a file scoped declaration! That's no good. To play
+    // around the previous grammar, we simply allow what came before to also
     // occur before a file scoped namespace declaration.
     file_scoped_namespace_declaration: ($, previous) => {
       return seq(
@@ -101,7 +120,30 @@ module.exports = grammar(standard_grammar, {
 	  $.ellipsis,
     ),
 
+    // Allow `...` as a switch-expression arm,
+    // e.g. `$X switch { $P => $E, ... }`.
+    switch_expression_arm: ($, previous) => choice(
+      previous,
+      $.ellipsis,
+    ),
+
+    // Allow `<...>` in a generic type parameter list,
+    // e.g. `class $C<...> { }`.
+    type_parameter: ($, previous) => choice(
+      previous,
+      $.ellipsis,
+    ),
+
     // Statement ellipsis: '...' not followed by ';'
+    //
+    // We also extend `expression_statement` to accept additional Semgrep
+    // expression-pattern shapes that the upstream
+    // `_expression_statement_expression` does not allow (it admits only
+    // assignment / invocation / unary / await / object-creation /
+    // parenthesized). Without these, patterns like `$X is $T $Y;`,
+    // `$"hello {$X}";`, `$X?.$Y;`, `typeof($T);`, `$X[..$Y];`,
+    // `$X..$Y;`, and `init $X => $Y;` would parse the expression at the
+    // top level but error on the trailing `;`.
     expression_statement: ($, previous) => {
       return choice(
         previous,
@@ -110,7 +152,16 @@ module.exports = grammar(standard_grammar, {
         seq($.deep_ellipsis, ';'),
         seq($.member_access_ellipsis_expression, ';'),
         seq($._semgrep_metavariable, ';'),
-        seq($.typed_metavariable, ';')
+        seq($.typed_metavariable, ';'),
+        // Semgrep-specific top-level expression shapes that upstream's
+        // `_expression_statement_expression` rejects.
+        seq($.is_pattern_expression, ';'),
+        seq($.interpolated_string_expression, ';'),
+        seq($.lambda_expression, ';'),
+        seq($.conditional_access_expression, ';'),
+        seq($.type_of_expression, ';'),
+        seq($.element_access_expression, ';'),
+        seq($.range_expression, ';'),
       );
     },
 
