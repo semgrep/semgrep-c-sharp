@@ -1,6 +1,6 @@
 File: semgrep-grammars/src/tree-sitter-c-sharp/LICENSE
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: fd7f7402db6e66afd70b402fb2e367b2d71c10d6
+Latest commit in repo: af29416d729b7a6603101b513604392d8f675e3b
 Last change in file:
   commit bf99ce8e40358bd215b06727b07ecc3f1e575afb
   Author: Amaan Qureshi <amaanq12@gmail.com>
@@ -10,21 +10,83 @@ Last change in file:
 ---
 File: semgrep-grammars/src/tree-sitter-c-sharp/grammar.js
 Git repo name: tree-sitter-c-sharp
-Latest commit in repo: fd7f7402db6e66afd70b402fb2e367b2d71c10d6
+Latest commit in repo: af29416d729b7a6603101b513604392d8f675e3b
 Last change in file:
-  commit ca97baabdc69ef587bd65950a2dc803e519017f6
-  Author: Amaan Qureshi <amaanq12@gmail.com>
-  Date:   Sun Sep 1 05:41:18 2024 -0400
+  commit f1c7c1ee21f56a33412c12efb8abe0c483f05f0d
+  Author: Alexandre Laroche <larochealexandre@hotmail.com>
+  Date:   Tue Jun 2 12:56:56 2026 -0400
   
-      fix: properly handle nested strings of different types inside interpolations
+      fix: parse `(IDENT) && EXPR` as logical-AND, not cast (#413) (#430)
+      
+      Tree-sitter's state-aware lexer was splitting `&&` into two `&`
+      tokens when the parser was exploring the cast-expression
+      interpretation of `(IDENT)`. With `&` listed as a prefix unary
+      operator and `cast_expression` accepting any expression as its
+      value, the cast state always preferred a unary `&` over the binary
+      `&&` (which isn't valid as an expression-start token), producing
+      the misparse `cast(IDENT, &(&EXPR))`.
+      
+      Fix: split address-of out of `prefix_unary_expression` into a
+      separate `_address_of_expression` rule that requires its operand
+      to be an lvalue (matching the C# spec's address-of-expression).
+      `(b > 0)` is not an lvalue, so once the lexer splits `&&` the
+      inner `& (b > 0)` no longer matches and the cast interpretation
+      fails; the parser then takes the parenthesized-expression path and
+      the lexer emits `&&` as a single token, giving the correct
+      logical-AND parse.
+      
+      The shape mirrors the existing `_pointer_indirection_expression`
+      (the `*` operator): both restrict their operand to an lvalue and
+      both alias back to the public `prefix_unary_expression` node so the
+      AST shape is preserved for downstream consumers. The intentional
+      omission of `&` and `*` from `prefix_unary_expression`'s choice
+      list is now documented inline.
+      
+      The existing `Dereference versus logical and` corpus test pinned
+      the buggy behavior — it is renamed to `Logical AND vs cast
+      disambiguation with parenthesized LHS (#413)` and expanded from 1
+      to 10 cases covering: chained `&&`, mixed `&&`/`||`, the negation
+      `!(x) && (y)`, the issue's exact `(x) && (y > 0)`, the
+      generic-type LHS `(MyType<T>) && c`, a single-`&` cast-like
+      `(l) & m`, an address-of on the RHS `(i) && &j`, and two
+      preservation sentinels for legitimate address-of (`(IntPtr) &x`
+      and `&x`).
+      
+      One known intentional consequence: `(int) && b` (and other
+      predefined-type LHS forms) now produce an ERROR node where they
+      previously misparsed as a cast. This is correct — `(int) && b` is
+      not valid C# (you can't logical-AND a type with a value), so the
+      previous "cast" parse was producing misleading output. The
+      parenthesized-expression fallback isn't available for predefined
+      types because they aren't expressions, so there's no clean
+      non-cast interpretation. Producing ERROR matches Roslyn's behavior
+      for the same input.
+      
+      The single-`&` cast-vs-bitwise-AND ambiguity (`(l) & m`) is left
+      as cast — that interpretation matches the C# spec's syntactic
+      disambiguation rule, and resolving it would require semantic
+      information that tree-sitter does not have.
+      
+      Closes #413
 ---
 File: semgrep-grammars/src/semgrep-c-sharp/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: a0fbb554957fa37e6bc6034096e32c9498cab8e2
+Latest commit in repo: 2aec31d8825819d6d8a84c4aae7654ca402919af
 Last change in file:
-  commit a0fbb554957fa37e6bc6034096e32c9498cab8e2
-  Author: Alexandre Laroche <alexandre.laroche@exfo.com>
-  Date:   Fri Oct 3 14:13:29 2025 +0000
+  commit 2aec31d8825819d6d8a84c4aae7654ca402919af
+  Author: Alexandre Laroche <larochealexandre@hotmail.com>
+  Date:   Tue Jun 2 20:37:32 2026 -0400
   
-      Fix
+      feat(c-sharp): allow lenient escape sequences in string literals
+      
+      Override `escape_sequence` to accept any `\<char>` after the spec
+      escapes have had a chance to match. Roslyn rejects unrecognized escape
+      sequences (CS1009), but semgrep is a static analyzer that wants to
+      scan real-world code that occasionally contains these (e.g. Windows
+      paths embedded in regular string literals: `"\\share\images"`). With
+      the upstream grammar's strict pattern, tree-sitter emits an ERROR node
+      and semgrep's parse-error gate fails the file entirely.
+      
+      `./test-lang c-sharp` stays green: 199/199 corpus tests pass and
+      ConvexHull.cs continues to parse cleanly.
 ---
